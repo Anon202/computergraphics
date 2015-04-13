@@ -29,9 +29,17 @@ Vector ScalarVecMul(float t, Vector a);
 HomVector MatVecMul(Matrix a, Vector b);
 Vector Homogenize(HomVector a);
 Matrix MatMatMul(Matrix a, Matrix b);
-void PrintMatrix(char *name, Matrix m);
-void PrintVector(char *name, Vector v);
-void PrintHomVector(char *name, HomVector h);
+void PrintMatrix(char const *name, Matrix m);
+void PrintVector(char const *name, Vector v);
+void PrintHomVector(char const *name, HomVector h);
+
+float radToDeg(float rad);
+float degToRad(float deg);
+Matrix rotationMat(char axis, float rad);
+Matrix translationMat(Vector x);
+Matrix scaleMat(float sx, float sy, float sz);
+Matrix perspectiveProjMat(float n, float f, float fovdeg, int screenw, int screenh);
+Matrix parallelProjMat(float n, float f, float fovdeg, int screenw, int screenh);
 
 #endif
 

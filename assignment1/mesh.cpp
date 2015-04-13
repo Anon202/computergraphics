@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "mesh.h"
+#include <stdio.h>
 
 float rnd() {
 	return 2.0f * float(rand()) / float(RAND_MAX) - 1.0f;
@@ -30,11 +31,15 @@ void insertModel(Mesh **list, int nv, float * vArr, int nt, int * tArr, float sc
 	// Assignment 1: 
 	// Calculate and store suitable vertex normals for the mesh here.
 	// Replace the code below that simply sets some arbitrary normal values	
-	for (int i = 0; i < nv; i++) {
-		mesh->vnorms[i].x = rnd();
-		mesh->vnorms[i].y = rnd();
-		mesh->vnorms[i].z = rnd();
-	}
+	for (int i = 0; i < nt; i++) {
+        Triangle t = mesh->triangles[i];
+        Vector ab = Subtract(mesh->vertices[t.vInds[1]], mesh->vertices[t.vInds[0]]);
+        Vector ac = Subtract(mesh->vertices[t.vInds[2]], mesh->vertices[t.vInds[0]]);
+        Vector cross = Normalize(CrossProduct(ab, ac));
+        mesh->vnorms[t.vInds[0]] = cross;
+        mesh->vnorms[t.vInds[1]] = cross;
+        mesh->vnorms[t.vInds[2]] = cross;
+    }
 
 	mesh->next = *list;
 	*list = mesh;	

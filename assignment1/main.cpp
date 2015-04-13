@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <glew.h>
 #include <freeglut.h>
+#include <math.h>
 
 #include "algebra.h"
 #include "shaders.h"
@@ -93,33 +94,36 @@ void renderMesh(Mesh *mesh) {
 	
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    // Enable Z-buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
 	// Draw all triangles
 	glDrawElements(GL_TRIANGLES, mesh->nt * 3, GL_UNSIGNED_INT, NULL); 
+
 }
-
-
 
 void display(void) {
 	Mesh *mesh;
 	
-	glClear(GL_COLOR_BUFFER_BIT);	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		
 	// Assignment1: Calculate the transform to view coordinates yourself 
 	// Replace this hard-coded transform. 
-	// M should be calculated from camera parameters 		
-	V.e[0] = 1.0f; V.e[4] = 0.0f; V.e[ 8] = 0.0f; V.e[12] =   0.0f;
-	V.e[1] = 0.0f; V.e[5] = 1.0f; V.e[ 9] = 0.0f; V.e[13] =   0.0f;
-	V.e[2] = 0.0f; V.e[6] = 0.0f; V.e[10] = 1.0f; V.e[14] = -cam.position.z;
-	V.e[3] = 0.0f; V.e[7] = 0.0f; V.e[11] = 0.0f; V.e[15] =   1.0f;
-
-	// Assignment1: Calculate the projection transform yourself 
+	// M should be calculated from camera parameters
+	Vector c = {.x = cam.position.x, .y = cam.position.y,
+                .z = -cam.position.z }; 
+    V = MatMatMul(
+          MatMatMul(
+            MatMatMul(rotationMat('z', cam.rotation.z), rotationMat('y', cam.rotation.y)),
+            rotationMat('x', cam.rotation.x)),
+          translationMat(c));
+	
+    // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
-	P.e[0] = 1.299038f; P.e[4] = 0.000000f; P.e[ 8] =  0.000000f; P.e[12] =  0.0f;
-	P.e[1] = 0.000000f; P.e[5] = 1.732051f; P.e[ 9] =  0.000000f; P.e[13] =  0.0f;
-	P.e[2] = 0.000000f; P.e[6] = 0.000000f; P.e[10] = -1.000200f; P.e[14] = -2.000200f;
-	P.e[3] = 0.000000f; P.e[7] = 0.000000f; P.e[11] = -1.000000f; P.e[15] =  0.0f;
+    P = perspectiveProjMat(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
+    //P = parallelProjMat(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
 
 	PV = MatMatMul(P, V);
 
@@ -140,7 +144,6 @@ void changeSize(int w, int h) {
 	screen_width = w;
 	screen_height = h;
 	glViewport(0, 0, screen_width, screen_height);
-
 }
 
 void keypress(unsigned char key, int x, int y) {
@@ -151,6 +154,36 @@ void keypress(unsigned char key, int x, int y) {
 	case 'Z':
 		cam.position.z += 0.2f;
 		break;
+	case 'y':
+		cam.position.y -= 0.2f;
+		break;
+	case 'Y':
+		cam.position.y += 0.2f;
+		break;
+    case 'x':
+        cam.position.x -= 0.2f;
+        break;
+    case 'X':
+        cam.position.x += 0.2f;
+        break;
+    case 'i':
+        cam.rotation.x -= M_PI/100;
+        break;
+    case 'I':
+        cam.rotation.x += M_PI/100;
+        break;
+    case 'j':
+        cam.rotation.y -= M_PI/100;
+        break;
+    case 'J':
+        cam.rotation.y += M_PI/100;
+        break;
+    case 'k':
+        cam.rotation.z -= M_PI/100;
+        break;
+    case 'K':
+        cam.rotation.z += M_PI/100;
+        break;
 	case 'Q':
 	case 'q':
 		exit(0);
@@ -221,7 +254,7 @@ int main(int argc, char **argv) {
 	// Note that "meshList" is a pointer to the first mesh and new meshes are added to the front of the list
 	
 	//insertModel(&meshList, bunny.nov, bunny.verts, bunny.nof, bunny.faces, 60.0);
-	insertModel(&meshList, cow.nov, cow.verts, cow.nof, cow.faces, 20.0);
+	//insertModel(&meshList, cow.nov, cow.verts, cow.nof, cow.faces, 20.0);
 	//insertModel(&meshList, cube.nov, cube.verts, cube.nof, cube.faces, 5.0);
 	//insertModel(&meshList, frog.nov, frog.verts, frog.nof, frog.faces, 2.5);
 	//insertModel(&meshList, knot.nov, knot.verts, knot.nof, knot.faces, 1.0);

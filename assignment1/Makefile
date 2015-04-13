@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := -O3 -g -Wall -Werror -Wno-unknown-pragmas
+CFLAGS := -O3 -g -Wall -Werror -Wno-unknown-pragmas -std=c++11 -D_USE_MATH_DEFINES #-Wextra
 INCLUDES := -I/usr/include/GL/
 LDFLAGS := -lm -lGL -lGLEW -lglut 
 SRCS := main.cpp mesh.cpp algebra.cpp 

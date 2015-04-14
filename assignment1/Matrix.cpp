@@ -146,29 +146,31 @@ namespace algebra {
         return m;
     }
     
-    Matrix Matrix::perspectiveProj(float n, float f, float fovdeg, int screenw, int screenh) {
+    Matrix Matrix::perspectiveProj(float n, float f, float fovdeg, float aspect) {
         Matrix m = Matrix();
         float fov = degToRad(fovdeg);
         float t = n*tan(fov/2);
-        float r = (t*screenw)/screenh;
+        float r = t*aspect;;
         float b = -t;
         float l = -r;
-        m.e[0] = 2*n/(r-l); m.e[4] = 0.0;       m.e[ 8] = (l+r)/(l-r); m.e[12] = 0.0;
-        m.e[1] = 0.0;       m.e[5] = 2*n/(t-b); m.e[ 9] = (b+t)/(b-t); m.e[13] = 0.0;
-        m.e[2] = 0.0;       m.e[6] = 0.0;       m.e[10] = (f+n)/(n-f); m.e[14] = 2*f*n/(n-f);
+        m.e[0] = 2*n/(r-l); m.e[4] = 0.0;       m.e[ 8] = (r+l)/(r-l); m.e[12] = 0.0;
+        m.e[1] = 0.0;       m.e[5] = 2*n/(t-b); m.e[ 9] = (t+b)/(t-b); m.e[13] = 0.0;
+        m.e[2] = 0.0;       m.e[6] = 0.0;       m.e[10] = (n+f)/(n-f); m.e[14] = 2*f*n/(n-f);
         m.e[3] = 0.0;       m.e[7] = 0.0;       m.e[11] = -1.0;        m.e[15] = 0.0;
         return m;
     }
     
-    Matrix Matrix::parallelProj(float n, float f, float fovdeg, int screenw, int screenh) {
+    Matrix Matrix::parallelProj(float n, float f, float fovdeg, float aspect) {
         Matrix m = Matrix();
         float fov = degToRad(fovdeg);
         float t = n*tan(fov/2);
-        float r = (t*screenw)/screenh;
-        m.e[0] = 1/r; m.e[4] = 0.0; m.e[ 8] = 0.0;      m.e[12] = 0.0;
-        m.e[1] = 0.0; m.e[5] = 1/t; m.e[ 9] = 0.0;      m.e[13] = 0.0;
-        m.e[2] = 0.0; m.e[6] = 0.0; m.e[10] = -2/(f-n); m.e[14] = -(f+n)/(f-n);
-        m.e[3] = 0.0; m.e[7] = 0.0; m.e[11] = 0.0;      m.e[15] = 1.0;
+        float r = t*aspect;
+        float b = -t;
+        float l = -r;
+        m.e[0] = 2/(r-l); m.e[4] = 0.0;     m.e[ 8] = 0.0;      m.e[12] = -(r+l)/(r-l);
+        m.e[1] = 0.0;     m.e[5] = 2/(t-b); m.e[ 9] = 0.0;      m.e[13] = -(t+b)/(t-b);
+        m.e[2] = 0.0;     m.e[6] = 0.0;     m.e[10] = 2/(n-f); m.e[14] = -(f+n)/(n-f);
+        m.e[3] = 0.0;     m.e[7] = 0.0;     m.e[11] = 0.0;      m.e[15] = 1.0;
         return m;
     } 
 }

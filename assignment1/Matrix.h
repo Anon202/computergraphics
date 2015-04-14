@@ -28,8 +28,8 @@ public:
     static Matrix rotation(char axis, float rad);
     static Matrix translation(Vector x);
     static Matrix scale(float sx, float sy, float sz);
-    static Matrix perspectiveProj(float n, float f, float fovdeg, int screenw, int screenh);
-    static Matrix parallelProj(float n, float f, float fovdeg, int screenw, int screenh);
+    static Matrix perspectiveProj(float n, float f, float fovdeg, float aspect);
+    static Matrix parallelProj(float n, float f, float fovdeg, float aspect);
 };
 
 }

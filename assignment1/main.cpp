@@ -123,8 +123,9 @@ void display(void) {
     // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
-    P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
-    //P = parallelProjMat(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
+    float aspect = (float)screen_width / screen_height;
+    P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
+    //P = Matrix::parallelProj(-cam.nearPlane, -cam.farPlane, cam.fov, aspect);
 	PV = P * V;
 
 	glUseProgram(shprg);

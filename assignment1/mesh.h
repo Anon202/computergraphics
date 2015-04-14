@@ -1,7 +1,10 @@
 #ifndef _MESH_H_
 #define _MESH_H_
 
-#include "algebra.h"
+#include "Vector.h"
+#include <vector>
+
+using namespace algebra;
 
 typedef struct _Triangle {
 	int vInds[3]; //vertex indices
@@ -9,8 +12,8 @@ typedef struct _Triangle {
 
 typedef struct _Mesh { 
 	int nv;				
-	Vector *vertices;
-	Vector *vnorms;
+	vector<Vector>* vertices;
+	vector<Vector>* vnorms;
 	int nt;				
 	Triangle *triangles;
 	struct _Mesh *next; 

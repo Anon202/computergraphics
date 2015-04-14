@@ -1,6 +1,5 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include "mesh.h"
-#include <stdio.h>
 
 float rnd() {
 	return 2.0f * float(rand()) / float(RAND_MAX) - 1.0f;
@@ -10,15 +9,16 @@ void insertModel(Mesh **list, int nv, float * vArr, int nt, int * tArr, float sc
 	Mesh * mesh = (Mesh *) malloc(sizeof(Mesh));
 	mesh->nv = nv;
 	mesh->nt = nt;	
-	mesh->vertices = (Vector *) malloc(nv * sizeof(Vector));
-	mesh->vnorms = (Vector *)malloc(nv * sizeof(Vector));
 	mesh->triangles = (Triangle *) malloc(nt * sizeof(Triangle));
-	
+    mesh->vertices = new vector<Vector>();
+    mesh->vnorms = new vector<Vector>();
+
 	// set mesh vertices
 	for (int i = 0; i < nv; i++) {
-		mesh->vertices[i].x = vArr[i*3] * scale;
-		mesh->vertices[i].y = vArr[i*3+1] * scale;
-		mesh->vertices[i].z = vArr[i*3+2] * scale;
+        float x = vArr[i*3] * scale;
+		float y = vArr[i*3+1] * scale;
+		float z = vArr[i*3+2] * scale;
+        mesh->vertices->push_back(Vector(x, y, z)); 
 	}
 
 	// set mesh triangles
@@ -31,16 +31,21 @@ void insertModel(Mesh **list, int nv, float * vArr, int nt, int * tArr, float sc
 	// Assignment 1: 
 	// Calculate and store suitable vertex normals for the mesh here.
 	// Replace the code below that simply sets some arbitrary normal values	
-	for (int i = 0; i < nt; i++) {
-        Triangle t = mesh->triangles[i];
-        Vector ab = Subtract(mesh->vertices[t.vInds[1]], mesh->vertices[t.vInds[0]]);
-        Vector ac = Subtract(mesh->vertices[t.vInds[2]], mesh->vertices[t.vInds[0]]);
-        Vector cross = Normalize(CrossProduct(ab, ac));
-        mesh->vnorms[t.vInds[0]] = cross;
-        mesh->vnorms[t.vInds[1]] = cross;
-        mesh->vnorms[t.vInds[2]] = cross;
+	for (int i = 0; i < nv; i++) {
+        mesh->vnorms->push_back(Vector(0, 0, 0));
     }
-
-	mesh->next = *list;
+    for (int i = 0; i < nt; i++) {
+        Triangle t = mesh->triangles[i];
+        for (int j = 0; j < 3; j++) {
+            Vector ab = mesh->vertices->at(t.vInds[(j+1)%3]) - mesh->vertices->at(t.vInds[j]);
+            Vector ac = mesh->vertices->at(t.vInds[(j+2)%3]) - mesh->vertices->at(t.vInds[j]);
+            mesh->vnorms->at(t.vInds[j]) += ab.cross(ac).normalized();
+        }
+    }
+    for (int i = 0; i < nv; i++) {
+        mesh->vnorms->at(i) = mesh->vnorms->at(i).normalized();
+    }
+	
+    mesh->next = *list;
 	*list = mesh;	
 }

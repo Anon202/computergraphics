@@ -1,13 +1,16 @@
 //#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
+#include <iostream>
+#include <cmath>
 #include <glew.h>
 #include <freeglut.h>
-#include <math.h>
 
-#include "algebra.h"
+#include "Matrix.h"
+#include "Vector.h"
 #include "shaders.h"
 #include "mesh.h"
 
+using namespace std;
+using namespace algebra;
 
 int screen_width = 1024;
 int screen_height = 768;
@@ -54,8 +57,8 @@ void prepareMesh(Mesh *mesh) {
 	glGenBuffers(1, &mesh->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeVerts + sizeCols, NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeVerts, (void *)mesh->vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeVerts, sizeCols, (void *)mesh->vnorms);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeVerts, (void *)&mesh->vertices->at(0));
+	glBufferSubData(GL_ARRAY_BUFFER, sizeVerts, sizeCols, (void *)&mesh->vnorms->at(0));
 
 	// For specification of the data stored in the vbo
 	glGenVertexArrays(1, &mesh->vao);
@@ -73,7 +76,7 @@ void renderMesh(Mesh *mesh) {
 	// Combine it with the viewing transform that is pass to the shader below
 
 	// Pass the viewing transform to the shader
-	GLint loc_PV = glGetUniformLocation(shprg, "PV");
+    GLint loc_PV = glGetUniformLocation(shprg, "PV");
 	glUniformMatrix4fv(loc_PV, 1, GL_FALSE, PV.e);
 
 
@@ -93,7 +96,7 @@ void renderMesh(Mesh *mesh) {
 	glVertexAttribPointer(vNorm, 3, GL_FLOAT, GL_FALSE, 0, (void *)(mesh->nv * 3 *sizeof(float)));
 	
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
     // Enable Z-buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -113,19 +116,16 @@ void display(void) {
 	// M should be calculated from camera parameters
 	Vector c = {.x = cam.position.x, .y = cam.position.y,
                 .z = -cam.position.z }; 
-    V = MatMatMul(
-          MatMatMul(
-            MatMatMul(rotationMat('z', cam.rotation.z), rotationMat('y', cam.rotation.y)),
-            rotationMat('x', cam.rotation.x)),
-          translationMat(c));
-	
+    V = Matrix::rotation('z', cam.rotation.z)
+            * Matrix::rotation('y', cam.rotation.y)
+            * Matrix::rotation('x', cam.rotation.x)
+            * Matrix::translation(c);
     // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
-    P = perspectiveProjMat(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
+    P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
     //P = parallelProjMat(cam.nearPlane, cam.farPlane, cam.fov, screen_width, screen_height);
-
-	PV = MatMatMul(P, V);
+	PV = P * V;
 
 	glUseProgram(shprg);
 
@@ -223,8 +223,7 @@ void cleanUp(void) {
 #include "./models/mesh_triceratops.h"
 
 
-int main(int argc, char **argv) {
-	
+int main(int argc, char **argv) {	
 	// Setup freeGLUT	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
@@ -242,13 +241,15 @@ int main(int argc, char **argv) {
 
 	// Use an OpenGL Loading Library to get access to modern core features as well as extensions
 	GLenum err = glewInit(); 
-	if (GLEW_OK != err) { fprintf(stdout, "Error: %s\n", glewGetErrorString(err)); return 1; }
+	if (GLEW_OK != err) {
+        cout << "Error: " << glewGetErrorString(err) << endl;
+        return 1;
+    }
 
 	// Output OpenGL version info
-	fprintf(stdout, "GLEW version: %s\n", glewGetString(GLEW_VERSION));
-	fprintf(stdout, "OpenGL version: %s\n", (const char *)glGetString(GL_VERSION));
-	fprintf(stdout, "OpenGL vendor: %s\n\n", glGetString(GL_VENDOR));
-
+	cout << "GLEW version: " << glewGetString(GLEW_VERSION) << endl;
+	cout << "OpenGL version: " << (const char *)glGetString(GL_VERSION) << endl;
+	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl << endl;
 
 	// Insert the 3D models you want in your scene here in a linked list of meshes
 	// Note that "meshList" is a pointer to the first mesh and new meshes are added to the front of the list

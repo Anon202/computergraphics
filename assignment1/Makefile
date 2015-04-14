@@ -2,7 +2,7 @@ CC := g++
 CFLAGS := -O3 -g -Wall -Werror -Wno-unknown-pragmas -std=c++11 -D_USE_MATH_DEFINES #-Wextra
 INCLUDES := -I/usr/include/GL/
 LDFLAGS := -lm -lGL -lGLEW -lglut 
-SRCS := main.cpp mesh.cpp algebra.cpp 
+SRCS := main.cpp mesh.cpp Vector.cpp HomVector.cpp Matrix.cpp 
 OBJS := $(SRCS:.cpp=.o)
 MAIN := assignment1
 

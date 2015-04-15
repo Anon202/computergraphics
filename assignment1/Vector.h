@@ -21,6 +21,7 @@ public:
     Vector normalized();
     Vector scalarMult(float c);
     void print(const char *name);    
+    Vector operator-();
     Vector operator-(const Vector& rhs);
     Vector operator+(const Vector& rhs);
     Vector& operator +=(const Vector& v);

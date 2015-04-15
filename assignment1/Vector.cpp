@@ -44,6 +44,13 @@ void Vector::print(const char *name) {
     cout << name << ": " << *this << endl;
 }
 
+Vector Vector::operator-() {
+    this->x = -this->x;
+    this->y = -this->y;
+    this->z = -this->z;
+    return *this;
+}
+
 Vector Vector::operator-(const Vector& rhs) {
     return this->subtract(rhs);
 }

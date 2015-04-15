@@ -3,11 +3,12 @@
 #include <cmath>
 #include <glew.h>
 #include <freeglut.h>
+#include <list>
 
 #include "Matrix.h"
 #include "Vector.h"
 #include "shaders.h"
-#include "mesh.h"
+#include "Mesh.h"
 
 using namespace std;
 using namespace algebra;
@@ -16,7 +17,7 @@ int screen_width = 1024;
 int screen_height = 768;
 
 
-Mesh *meshList = NULL; // Pointer to linked list of triangle meshes
+list<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 
 Camera cam = {{0,0,20}, {0,0,0}, 60, 1, 10000}; // Setup the camera parameters
 
@@ -48,17 +49,17 @@ void prepareShaderProgram() {
 }
 
 
-void prepareMesh(Mesh *mesh) {
-	int sizeVerts = mesh->nv * 3 * sizeof(float);
-	int sizeCols  = mesh->nv * 3 * sizeof(float);
-	int sizeTris = mesh->nt * 3 * sizeof(int);
+void prepareMesh(Mesh* mesh) {
+	int sizeVerts = mesh->nvertices() * 3 * sizeof(float);
+	int sizeCols = mesh->nvertices() * 3 * sizeof(float);
+	int sizeTris = mesh->ntriangles() * 3 * sizeof(int);
 
 	// Allocate GPU buffer and load mesh data
 	glGenBuffers(1, &mesh->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeVerts + sizeCols, NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeVerts, (void *)&mesh->vertices->at(0));
-	glBufferSubData(GL_ARRAY_BUFFER, sizeVerts, sizeCols, (void *)&mesh->vnorms->at(0));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeVerts, (void *)&mesh->vertices.at(0));
+	glBufferSubData(GL_ARRAY_BUFFER, sizeVerts, sizeCols, (void *)&mesh->vnorms.at(0));
 
 	// For specification of the data stored in the vbo
 	glGenVertexArrays(1, &mesh->vao);
@@ -67,18 +68,18 @@ void prepareMesh(Mesh *mesh) {
 	// Allocate GPU index buffer and load mesh indices
 	glGenBuffers(1, &mesh->ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeTris, (void *)mesh->triangles, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeTris, (void *)&mesh->triangles.at(0), GL_STATIC_DRAW);
 }
 
-void renderMesh(Mesh *mesh) {
+void renderMesh(Mesh* mesh) {
 	
 	// Assignment 1: Apply the transforms from local mesh coordinates to world coordinates here
 	// Combine it with the viewing transform that is pass to the shader below
+    Matrix PVW = PV * mesh->transformationMatrix();
 
 	// Pass the viewing transform to the shader
     GLint loc_PV = glGetUniformLocation(shprg, "PV");
-	glUniformMatrix4fv(loc_PV, 1, GL_FALSE, PV.e);
-
+	glUniformMatrix4fv(loc_PV, 1, GL_FALSE, PVW.e);
 
 	// Select current resources 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
@@ -93,7 +94,8 @@ void renderMesh(Mesh *mesh) {
 	// Set up normal array
 	GLint vNorm = glGetAttribLocation(shprg, "vNorm");
 	glEnableVertexAttribArray(vNorm);
-	glVertexAttribPointer(vNorm, 3, GL_FLOAT, GL_FALSE, 0, (void *)(mesh->nv * 3 *sizeof(float)));
+	glVertexAttribPointer(vNorm, 3, GL_FLOAT, GL_FALSE, 0,
+            (void *)(mesh->nvertices() * 3 *sizeof(float)));
 	
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
@@ -102,13 +104,10 @@ void renderMesh(Mesh *mesh) {
     glDepthFunc(GL_LESS);
 
 	// Draw all triangles
-	glDrawElements(GL_TRIANGLES, mesh->nt * 3, GL_UNSIGNED_INT, NULL); 
-
+	glDrawElements(GL_TRIANGLES, mesh->ntriangles() * 3, GL_UNSIGNED_INT, NULL); 
 }
 
 void display(void) {
-	Mesh *mesh;
-	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		
 	// Assignment1: Calculate the transform to view coordinates yourself 
@@ -126,17 +125,15 @@ void display(void) {
     float aspect = (float)screen_width / screen_height;
     P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
     //P = Matrix::parallelProj(-cam.nearPlane, -cam.farPlane, cam.fov, aspect);
-	PV = P * V;
+
+    PV = P * V;
 
 	glUseProgram(shprg);
-
-	// render all meshes in the scene
-	mesh = meshList;
-		
-	while (mesh != NULL) {
-		renderMesh(mesh);
-		mesh = mesh->next;
-	}
+   
+    list<Mesh*>::const_iterator iter; 
+    for (iter = meshList.begin(); iter != meshList.end(); iter++) {
+        renderMesh(*iter);
+    }
 
 	glFlush();
 }
@@ -195,11 +192,10 @@ void keypress(unsigned char key, int x, int y) {
 
 void init(void) {
 	// Setup OpenGL buffers for rendering of the meshes
-	Mesh * mesh = meshList;
-	while (mesh != NULL) {
-		prepareMesh(mesh);
-		mesh = mesh->next;
-	}
+    list<Mesh*>::const_iterator iter;
+    for (iter = meshList.begin(); iter != meshList.end(); iter++) {
+        prepareMesh(*iter);
+    }
 	
 	// Compile and link shader program
 	prepareShaderProgram(); 
@@ -243,7 +239,7 @@ int main(int argc, char **argv) {
 	// Use an OpenGL Loading Library to get access to modern core features as well as extensions
 	GLenum err = glewInit(); 
 	if (GLEW_OK != err) {
-        cout << "Error: " << glewGetErrorString(err) << endl;
+        cerr << "Error: " << glewGetErrorString(err) << endl;
         return 1;
     }
 
@@ -262,9 +258,14 @@ int main(int argc, char **argv) {
 	//insertModel(&meshList, knot.nov, knot.verts, knot.nof, knot.faces, 1.0);
 	//insertModel(&meshList, sphere.nov, sphere.verts, sphere.nof, sphere.faces, 12.0);
 	//insertModel(&meshList, teapot.nov, teapot.verts, teapot.nof, teapot.faces, 3.0);
-	insertModel(&meshList, triceratops.nov, triceratops.verts, triceratops.nof, triceratops.faces, 3.0);
-	
-	init();
+    Mesh tr = Mesh(triceratops.nov, triceratops.nof, triceratops.verts, triceratops.faces);
+    Mesh co = Mesh(cow.nov, cow.nof, cow.verts, cow.faces);
+    tr.setScale(Vector(2, 2, 2));
+    co.setTranslation(Vector(-10, 5, 5));
+    co.setScale(Vector(4, 4, 4));
+	meshList.push_back(&tr);
+	meshList.push_back(&co);
+    init();
 	glutMainLoop();
 
 	cleanUp();	

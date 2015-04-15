@@ -27,7 +27,7 @@ public:
     friend ostream& operator<<(ostream &o, const Matrix& m);        
     static Matrix rotation(char axis, float rad);
     static Matrix translation(Vector x);
-    static Matrix scale(float sx, float sy, float sz);
+    static Matrix scale(Vector s);
     static Matrix perspectiveProj(float n, float f, float fovdeg, float aspect);
     static Matrix parallelProj(float n, float f, float fovdeg, float aspect);
 };

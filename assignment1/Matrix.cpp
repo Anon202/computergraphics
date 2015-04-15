@@ -137,11 +137,11 @@ namespace algebra {
         return m;
     }
     
-    Matrix Matrix::scale(float sx, float sy, float sz) {
+    Matrix Matrix::scale(Vector s) {
         Matrix m = Matrix();
-        m.e[0] =  sx; m.e[4] = 0.0; m.e[ 8] = 0.0; m.e[12] = 0.0;
-        m.e[1] = 0.0; m.e[5] =  sy; m.e[ 9] = 0.0; m.e[13] = 0.0;
-        m.e[2] = 0.0; m.e[6] = 0.0; m.e[10] =  sz; m.e[14] = 0.0;
+        m.e[0] = s.x; m.e[4] = 0.0; m.e[ 8] = 0.0; m.e[12] = 0.0;
+        m.e[1] = 0.0; m.e[5] = s.y; m.e[ 9] = 0.0; m.e[13] = 0.0;
+        m.e[2] = 0.0; m.e[6] = 0.0; m.e[10] = s.z; m.e[14] = 0.0;
         m.e[3] = 0.0; m.e[7] = 0.0; m.e[11] = 0.0; m.e[15] = 1.0;
         return m;
     }

@@ -6,14 +6,6 @@
 using namespace algebra;
 using namespace std;
 
-typedef struct _Camera {
-	Vector position;
-	Vector rotation;
-	double fov; 
-	double nearPlane; 
-	double farPlane; 
-} Camera;
-
 typedef struct _Triangle {
 	int vInds[3]; //vertex indices
 } Triangle;

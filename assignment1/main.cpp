@@ -13,17 +13,26 @@
 using namespace std;
 using namespace algebra;
 
+typedef struct _Camera {
+	Vector position;
+	Vector rotation;
+    Vector viewdir;
+    Vector up;
+	double fov; 
+	double nearPlane; 
+	double farPlane; 
+} Camera;
+
 int screen_width = 1024;
 int screen_height = 768;
 
-
 list<Mesh*> meshList;  // Pointer to linked list of triangle meshes
-
-Camera cam = {{0,0,20}, {0,0,0}, 60, 1, 10000}; // Setup the camera parameters
-
-
+Camera cam = {Vector(0, 0, 20),
+              Vector(0,0,0),
+              Vector(0, 0, -20),
+              Vector(0, 20, 20),
+              60, 1, 10000}; // Setup the camera parameters
 GLuint shprg; // Shader program id
-
 
 // Transform matrices
 // V is view transform

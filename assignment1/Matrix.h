@@ -30,6 +30,7 @@ public:
     static Matrix scale(Vector s);
     static Matrix perspectiveProj(float n, float f, float fovdeg, float aspect);
     static Matrix parallelProj(float n, float f, float fovdeg, float aspect);
+    static Matrix rotationAroundAxis(Vector v, float rad);
 };
 
 }

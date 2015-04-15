@@ -172,5 +172,33 @@ namespace algebra {
         m.e[2] = 0.0;     m.e[6] = 0.0;     m.e[10] = 2/(n-f); m.e[14] = -(f+n)/(n-f);
         m.e[3] = 0.0;     m.e[7] = 0.0;     m.e[11] = 0.0;      m.e[15] = 1.0;
         return m;
-    } 
+    }
+
+    Matrix Matrix::rotationAroundAxis(Vector v, float rad) {
+        Matrix m = Matrix();
+        Vector u = v.normalized();
+        float c = cos(rad);
+        float s = sin(rad);
+        m.e[ 0] = c + u.x*u.x*(1 - c);
+        m.e[ 1] = u.y*u.x*(1 - c) + u.z*s;
+        m.e[ 2] = u.z*u.x*(1 - c) - u.y*s;
+        m.e[ 3] = 0.0;
+
+        m.e[ 4] = u.x*u.y*(1 - c) - u.z*s;
+        m.e[ 5] = c + u.y*u.y*(1 - c);
+        m.e[ 6] = u.z*u.y*(1 - c) + u.x*s;
+        m.e[ 7] = 0.0;
+        
+        m.e[ 8] = u.x*u.z*(1 - c) + u.y*s;
+        m.e[ 9] = u.y*u.z*(1 - c) - u.x*s;
+        m.e[10] = c + u.z*u.z*(1 - c);
+        m.e[11] = 0.0;
+ 
+        m.e[12] = 0.0;
+        m.e[13] = 0.0;
+        m.e[14] = 0.0;
+        m.e[15] = 1.0;
+
+        return m;
+    }
 }

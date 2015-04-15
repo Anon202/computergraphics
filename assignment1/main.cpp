@@ -9,29 +9,16 @@
 #include "Vector.h"
 #include "shaders.h"
 #include "Mesh.h"
+#include "Camera.h"
 
 using namespace std;
 using namespace algebra;
-
-typedef struct _Camera {
-	Vector position;
-	Vector rotation;
-    Vector viewdir;
-    Vector up;
-	double fov; 
-	double nearPlane; 
-	double farPlane; 
-} Camera;
 
 int screen_width = 1024;
 int screen_height = 768;
 
 list<Mesh*> meshList;  // Pointer to linked list of triangle meshes
-Camera cam = {Vector(0, 0, 20),
-              Vector(0,0,0),
-              Vector(0, 0, -20),
-              Vector(0, 20, 20),
-              60, 1, 10000}; // Setup the camera parameters
+Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20), Vector(0,0,0)); // Setup the camera parameters
 GLuint shprg; // Shader program id
 
 // Transform matrices
@@ -122,11 +109,11 @@ void display(void) {
 	// Assignment1: Calculate the transform to view coordinates yourself 
 	// Replace this hard-coded transform. 
 	// M should be calculated from camera parameters
-	Vector c = {.x = cam.position.x, .y = cam.position.y,
-                .z = -cam.position.z }; 
-    V = Matrix::rotation('z', cam.rotation.z)
-            * Matrix::rotation('y', cam.rotation.y)
-            * Matrix::rotation('x', cam.rotation.x)
+	Vector c = {.x = cam.Position().x, .y = cam.Position().y,
+                .z = -cam.Position().z }; 
+    V = Matrix::rotation('z', cam.Rotation().z)
+            * Matrix::rotation('y', cam.Rotation().y)
+            * Matrix::rotation('x', cam.Rotation().x)
             * Matrix::translation(c);
     // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
@@ -135,6 +122,7 @@ void display(void) {
     P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
     //P = Matrix::parallelProj(-cam.nearPlane, -cam.farPlane, cam.fov, aspect);
 
+    //Matrix Mcam = cam.lookAt();
     PV = P * V;
 
 	glUseProgram(shprg);
@@ -155,41 +143,15 @@ void changeSize(int w, int h) {
 
 void keypress(unsigned char key, int x, int y) {
 	switch(key) {
-	case 'z':
-		cam.position.z -= 0.2f;
-		break;
-	case 'Z':
-		cam.position.z += 0.2f;
-		break;
-	case 'y':
-		cam.position.y -= 0.2f;
-		break;
-	case 'Y':
-		cam.position.y += 0.2f;
-		break;
-    case 'x':
-        cam.position.x -= 0.2f;
+	case 'z': case 'Z':
+	case 'y': case 'Y':
+    case 'x': case 'X':
+        cam.Move(key);
         break;
-    case 'X':
-        cam.position.x += 0.2f;
-        break;
-    case 'i':
-        cam.rotation.x -= M_PI/100;
-        break;
-    case 'I':
-        cam.rotation.x += M_PI/100;
-        break;
-    case 'j':
-        cam.rotation.y -= M_PI/100;
-        break;
-    case 'J':
-        cam.rotation.y += M_PI/100;
-        break;
-    case 'k':
-        cam.rotation.z -= M_PI/100;
-        break;
-    case 'K':
-        cam.rotation.z += M_PI/100;
+    case 'i': case 'I':
+    case 'j': case 'J':
+    case 'k': case 'K':
+        cam.Rotate(key);
         break;
 	case 'Q':
 	case 'q':

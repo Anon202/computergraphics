@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 #include "Mesh.h"
 
 Mesh::Mesh(int nov, int nof) : nv(nov), nt(nof) {
@@ -72,6 +73,48 @@ Matrix Mesh::transformationMatrix() {
             * Matrix::rotation('y', rotation.y)
             * Matrix::rotation('z', rotation.z)
             * Matrix::scale(scale);
+}
+
+void Mesh::Move(char dir) {
+    int f = 1;
+    if (dir < 'A' || dir > 'Z') {
+        f = -1;
+    }
+    switch (dir) {
+        case 'x': case 'X':
+            this->translation.x += f*0.2;
+            break;
+        case 'y': case 'Y':
+            this->translation.y += f*0.2;
+            break;
+        case 'z': case 'Z':
+            this->translation.z += f*0.2;
+            break;
+        default:
+            // TODO: throw exception
+            break;
+    }
+}
+
+void Mesh::Rotate(char dir) {
+    int f = 1;
+    if (dir < 'A' || dir > 'Z') {
+        f = -1;
+    }
+    switch (dir) {
+        case 'i': case 'I':
+            this->rotation.x += f*M_PI/100;
+            break;
+        case 'j': case 'J':
+            this->rotation.y += f*M_PI/100;
+            break;
+        case 'k': case 'K':
+            this->rotation.z += f*M_PI/100;
+            break;
+        default:
+            // TODO: throw exception
+            break;
+    }
 }
 
 /*Mesh Mesh::load(string model_name) {

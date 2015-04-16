@@ -3,7 +3,7 @@
 #include <cmath>
 #include <glew.h>
 #include <freeglut.h>
-#include <list>
+#include <vector>
 
 #include "Matrix.h"
 #include "Vector.h"
@@ -16,8 +16,10 @@ using namespace algebra;
 
 int screen_width = 1024;
 int screen_height = 768;
+int selected_obj = 0;
+bool moving_cam = true;
 
-list<Mesh*> meshList;  // Pointer to linked list of triangle meshes
+vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20), Vector(0,0,0)); // Setup the camera parameters
 GLuint shprg; // Shader program id
 
@@ -96,7 +98,9 @@ void renderMesh(Mesh* mesh) {
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
     // Enable Z-buffer
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
 	// Draw all triangles
@@ -119,17 +123,19 @@ void display(void) {
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
     float aspect = (float)screen_width / screen_height;
+    P = Matrix::parallelProj(screen_height/40.0,
+                             screen_width/40.0,
+                             -screen_height/40.0,
+                             -screen_width/40.0, cam.nearPlane, cam.farPlane);
     P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
-    //P = Matrix::parallelProj(-cam.nearPlane, -cam.farPlane, cam.fov, aspect);
 
     //Matrix Mcam = cam.lookAt();
     PV = P * V;
 
 	glUseProgram(shprg);
    
-    list<Mesh*>::const_iterator iter; 
-    for (iter = meshList.begin(); iter != meshList.end(); iter++) {
-        renderMesh(*iter);
+    for (unsigned int i = 0; i < meshList.size(); i++) {
+        renderMesh(meshList[i]);
     }
 
 	glFlush();
@@ -142,16 +148,29 @@ void changeSize(int w, int h) {
 }
 
 void keypress(unsigned char key, int x, int y) {
-	switch(key) {
+	if (key >= '0' && key <= '9') {
+        if ((unsigned int)(key - '0') > meshList.size()) {
+            return;
+        }
+        selected_obj = key - '0';
+        moving_cam = false;
+        return;
+    }
+    switch(key) {
+    case 'c': case 'C':
+        moving_cam = true;
+        break;
 	case 'z': case 'Z':
 	case 'y': case 'Y':
     case 'x': case 'X':
-        cam.Move(key);
+        if (moving_cam) cam.Move(key);
+        else meshList[selected_obj]->Move(key);
         break;
     case 'i': case 'I':
     case 'j': case 'J':
     case 'k': case 'K':
-        cam.Rotate(key);
+        if (moving_cam) cam.Rotate(key);
+        else meshList[selected_obj]->Rotate(key);
         break;
 	case 'Q':
 	case 'q':
@@ -163,9 +182,8 @@ void keypress(unsigned char key, int x, int y) {
 
 void init(void) {
 	// Setup OpenGL buffers for rendering of the meshes
-    list<Mesh*>::const_iterator iter;
-    for (iter = meshList.begin(); iter != meshList.end(); iter++) {
-        prepareMesh(*iter);
+    for (unsigned int i = 0; i < meshList.size(); i++) {
+        prepareMesh(meshList[i]);
     }
 	
 	// Compile and link shader program

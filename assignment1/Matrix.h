@@ -29,7 +29,7 @@ public:
     static Matrix translation(Vector x);
     static Matrix scale(Vector s);
     static Matrix perspectiveProj(float n, float f, float fovdeg, float aspect);
-    static Matrix parallelProj(float n, float f, float fovdeg, float aspect);
+    static Matrix parallelProj(float t, float r, float b, float l, int n, int f);
     static Matrix rotationAroundAxis(Vector v, float rad);
 };
 

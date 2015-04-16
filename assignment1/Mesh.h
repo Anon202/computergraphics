@@ -32,4 +32,6 @@ class Mesh {
         void setRotation(Vector rotation);
         void setTranslation(Vector scale);
         Matrix transformationMatrix();
+        void Rotate(char dir);
+        void Move(char dir);
 };

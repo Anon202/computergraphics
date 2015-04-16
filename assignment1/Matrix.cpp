@@ -50,8 +50,7 @@ namespace algebra {
     Matrix Matrix::multiply(float c) {
         Matrix r = Matrix();
         for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                r.set(i, j, this->get(i, j) * c);
+            for (int j = 0; j < 4; j++) { r.set(i, j, this->get(i, j) * c);
             }
         }
         return r;
@@ -160,16 +159,11 @@ namespace algebra {
         return m;
     }
     
-    Matrix Matrix::parallelProj(float n, float f, float fovdeg, float aspect) {
+    Matrix Matrix::parallelProj(float t, float r, float b, float l, int n, int f) {
         Matrix m = Matrix();
-        float fov = degToRad(fovdeg);
-        float t = n*tan(fov/2);
-        float r = t*aspect;
-        float b = -t;
-        float l = -r;
         m.e[0] = 2/(r-l); m.e[4] = 0.0;     m.e[ 8] = 0.0;      m.e[12] = -(r+l)/(r-l);
         m.e[1] = 0.0;     m.e[5] = 2/(t-b); m.e[ 9] = 0.0;      m.e[13] = -(t+b)/(t-b);
-        m.e[2] = 0.0;     m.e[6] = 0.0;     m.e[10] = 2/(n-f); m.e[14] = -(f+n)/(n-f);
+        m.e[2] = 0.0;     m.e[6] = 0.0;     m.e[10] = -2/(n-f); m.e[14] = -(f+n)/(f-n);
         m.e[3] = 0.0;     m.e[7] = 0.0;     m.e[11] = 0.0;      m.e[15] = 1.0;
         return m;
     }

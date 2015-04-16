@@ -34,4 +34,5 @@ class Mesh {
         Matrix transformationMatrix();
         void Rotate(char dir);
         void Move(char dir);
+        void Scale(char dir);
 };

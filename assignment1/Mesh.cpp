@@ -35,9 +35,9 @@ Mesh::Mesh(int nv, int nt, float *vArr, int *tArr) : nv(nv), nt(nt) {
 	// Replace the code below that simply sets some arbitrary normal values	
     for (int i = 0; i < nt; i++) {
         Triangle t = this->triangles[i];
+        Vector ab = this->vertices[t.vInds[1]] - this->vertices[t.vInds[0]];
+        Vector ac = this->vertices[t.vInds[2]] - this->vertices[t.vInds[0]];
         for (int j = 0; j < 3; j++) {
-            Vector ab = this->vertices[t.vInds[(j+1)%3]] - this->vertices[t.vInds[j]];
-            Vector ac = this->vertices[t.vInds[(j+2)%3]] - this->vertices[t.vInds[j]];
             this->vnorms[t.vInds[j]] += ab.cross(ac).normalized();
         }
     }
@@ -110,6 +110,27 @@ void Mesh::Rotate(char dir) {
             break;
         case 'k': case 'K':
             this->rotation.z += f*M_PI/100;
+            break;
+        default:
+            // TODO: throw exception
+            break;
+    }
+}
+
+void Mesh::Scale(char dir) {
+    int f = 1;
+    if (dir < 'A' || dir > 'Z') {
+        f = -1;
+    }
+    switch (dir) {
+        case 'x': case 'X':
+            this->scale.x += f*0.02;
+            break;
+        case 'y': case 'Y':
+            this->scale.y += f*0.02;
+            break;
+        case 'z': case 'Z':
+            this->scale.z += f*0.02;
             break;
         default:
             // TODO: throw exception

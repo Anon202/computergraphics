@@ -172,6 +172,18 @@ void keypress(unsigned char key, int x, int y) {
         if (moving_cam) cam.Rotate(key);
         else meshList[selected_obj]->Rotate(key);
         break;
+    case 'w': case 'W':
+    case 'e': case 'E':
+    case 'r': case 'R':
+        if (!moving_cam) {
+            char dir = key;
+            if (dir >= 'A' && dir <= 'Z') dir = key - 'A' + 'a';
+            dir = (dir == 'w')? 'x' : ((dir == 'e')? 'y' : 'z');
+            if (key >= 'A' && key <= 'Z') dir = dir - 'a' + 'A';
+            cout << dir << endl;
+            meshList[selected_obj]->Scale(dir);
+        }
+        break;
 	case 'Q':
 	case 'q':
 		exit(0);

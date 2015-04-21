@@ -18,6 +18,7 @@ int screen_width = 1024;
 int screen_height = 768;
 int selected_obj = 0;
 bool moving_cam = true;
+bool use_parallel_proj = false;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20), Vector(0,0,0)); // Setup the camera parameters
@@ -98,9 +99,9 @@ void renderMesh(Mesh* mesh) {
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
     // Enable Z-buffer
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
 	// Draw all triangles
@@ -123,11 +124,13 @@ void display(void) {
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
     float aspect = (float)screen_width / screen_height;
-    P = Matrix::parallelProj(screen_height/40.0,
-                             screen_width/40.0,
-                             -screen_height/40.0,
-                             -screen_width/40.0, cam.nearPlane, cam.farPlane);
     P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
+
+    if (use_parallel_proj) {
+        P = Matrix::parallelProj(screen_height/40.0,
+                screen_width/40.0, -screen_height/40.0,
+                -screen_width/40.0, cam.nearPlane, cam.farPlane);
+    }
 
     //Matrix Mcam = cam.lookAt();
     PV = P * V;
@@ -157,6 +160,9 @@ void keypress(unsigned char key, int x, int y) {
         return;
     }
     switch(key) {
+    case 'p': case 'P':
+        use_parallel_proj = true;
+        break;
     case 'c': case 'C':
         moving_cam = true;
         break;
@@ -210,21 +216,10 @@ void cleanUp(void) {
 	// ...
 }
 
-// Include data for some triangle meshes (hard coded in struct variables)
-#include "./models/mesh_bunny.h"
-#include "./models/mesh_cow.h"
-#include "./models/mesh_cube.h"
-#include "./models/mesh_frog.h"
-#include "./models/mesh_knot.h"
-#include "./models/mesh_sphere.h"
-#include "./models/mesh_teapot.h"
-#include "./models/mesh_triceratops.h"
-
-
 int main(int argc, char **argv) {	
 	// Setup freeGLUT	
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screen_width, screen_height);
 	glutCreateWindow("DVA304 Assignments");
 	glutDisplayFunc(display);

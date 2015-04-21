@@ -3,17 +3,13 @@
 #include <cmath>
 #include "Mesh.h"
 
-Mesh::Mesh(int nov, int nof) : nv(nov), nt(nof) {
-    this->rotation = Vector(0, 0, 0);
-    this->translation = Vector(0, 0, 0);
-    this->scale = Vector(1, 1, 1);
-}
-
 Mesh::Mesh(int nv, int nt, float *vArr, int *tArr) : nv(nv), nt(nt) {
     this->vertices.resize(nv);
     this->vnorms.resize(nv);
     this->triangles.resize(nt);
     this->scale = Vector(1, 1, 1);
+    this->rotation = Vector(0, 0, 0);
+    this->translation = Vector(0, 0, 0);
 	
     // set mesh vertices
 	for (int i = 0; i < nv; i++) {
@@ -138,46 +134,40 @@ void Mesh::Scale(char dir) {
     }
 }
 
-/*Mesh Mesh::load(string model_name) {
-    vector<Vector> tmpvertices;
-    vector<Vector> tmpvnorms;
-    vector<Triangle> triangles;
-    int r;
+Mesh Mesh::load(string model_name) {
+    vector<float> vArr;
+    vector<int> tArr;
+    int nt = 0, nv = 0, r;
     char line_header[128];
     
-    FILE * file = fopen(model_name.c_str(), "r");
+    FILE* file = fopen(model_name.c_str(), "r");
     if (file == NULL) {
         // TODO: throw exception
     }
     
     while ((r = fscanf(file, "%s", line_header)) != EOF) {
         if (strcmp(line_header, "v") == 0) {
-            Vector v;
-            fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
-            tmpvertices.push_back(v);
-        } else if (strcmp(line_header, "vt")) {
+            float x, y, z;
+            fscanf(file, "%f %f %f\n", &x, &y, &z);
+            vArr.push_back(x);
+            vArr.push_back(y);
+            vArr.push_back(z);
+            nv++;
+        } else if (strcmp(line_header, "vt") == 0) {
             // ignore for now
-        } else if (strcmp(line_header, "vn")) {
-            Vector v;
-            fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
-            tmpvnorms.push_back(v);
-        } else if (strcmp(line_header, "f")) {
-            Triangle t;
-            fscanf(file, "%d/%*d/%*d %*d/%*d/%*d %*d/%*d/%*d\n",
-                    &t.vInds[0], &t.vInds[1], &t.vInds[2);
-            triangles.push_back(t);
+        } else if (strcmp(line_header, "vn") == 0) {
+            // ignore for now (computed when creatig the mesh)
+        } else if (strcmp(line_header, "f") == 0) {
+            int v1, v2, v3;
+            fscanf(file, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d\n",
+                    &v1, &v2, &v3);
+            tArr.push_back(v1-1);
+            tArr.push_back(v2-1);
+            tArr.push_back(v3-1);
+            nt++;
         } else {
             // ignore for now
         }
     }
-
-    if (vertices.size() != vnorms.size()) {
-        // TODO: throw exception
-    }
-
-    Mesh m = Mesh(vertices.size(), triangles.size());
-    m.vertices = vertices;
-    m.triangles = triangles;
-    m.vnorms = vnorms;
-    return m;
-}*/
+    return Mesh(nv, nt, &vArr[0], &tArr[0]);
+}

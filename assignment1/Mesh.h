@@ -16,8 +16,7 @@ class Mesh {
         Vector rotation;
         Vector translation;
         Vector scale;
-        
-        Mesh(int nov, int nof);
+        Mesh(int nv, int nt);
 
     public:
         vector<Vector> vertices;

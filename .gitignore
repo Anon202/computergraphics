@@ -3,6 +3,7 @@
 *.lo
 *.o
 *.obj
+!assignment1/models/*.obj
 
 # Precompiled Headers
 *.gch
@@ -27,3 +28,6 @@
 *.out
 *.app
 assignment1/assignment1
+
+# Others
+other/

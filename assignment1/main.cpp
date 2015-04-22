@@ -21,7 +21,7 @@ bool moving_cam = true;
 bool use_parallel_proj = false;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
-Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20), Vector(0,0,0)); // Setup the camera parameters
+Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20)); // Setup the camera parameters
 GLuint shprg; // Shader program id
 
 // Transform matrices
@@ -114,12 +114,8 @@ void display(void) {
 	// Assignment1: Calculate the transform to view coordinates yourself 
 	// Replace this hard-coded transform. 
 	// M should be calculated from camera parameters
-	Vector c = {.x = cam.Position().x, .y = cam.Position().y,
-                .z = -cam.Position().z }; 
-    V = Matrix::rotation('z', cam.Rotation().z)
-            * Matrix::rotation('y', cam.Rotation().y)
-            * Matrix::rotation('x', cam.Rotation().x)
-            * Matrix::translation(c);
+    Matrix V = cam.lookAt();
+    
     // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
@@ -132,7 +128,6 @@ void display(void) {
                 -screen_width/40.0, cam.nearPlane, cam.farPlane);
     }
 
-    //Matrix Mcam = cam.lookAt();
     PV = P * V;
 
 	glUseProgram(shprg);
@@ -151,7 +146,7 @@ void changeSize(int w, int h) {
 }
 
 void keypress(unsigned char key, int x, int y) {
-	if (key >= '0' && key <= '9') {
+    if (key >= '0' && key <= '9') {
         if ((unsigned int)(key - '0') > meshList.size()) {
             return;
         }
@@ -161,7 +156,7 @@ void keypress(unsigned char key, int x, int y) {
     }
     switch(key) {
     case 'p': case 'P':
-        use_parallel_proj = true;
+        use_parallel_proj = !use_parallel_proj;
         break;
     case 'c': case 'C':
         moving_cam = true;
@@ -186,7 +181,6 @@ void keypress(unsigned char key, int x, int y) {
             if (dir >= 'A' && dir <= 'Z') dir = key - 'A' + 'a';
             dir = (dir == 'w')? 'x' : ((dir == 'e')? 'y' : 'z');
             if (key >= 'A' && key <= 'Z') dir = dir - 'a' + 'A';
-            cout << dir << endl;
             meshList[selected_obj]->Scale(dir);
         }
         break;
@@ -246,8 +240,12 @@ int main(int argc, char **argv) {
 
 	// Insert the 3D models you want in your scene here in a vector of meshes
     Mesh tr = Mesh::load("models/triceratops.obj");
+    Mesh cow = Mesh::load("models/cow.obj");
     tr.setScale(Vector(2, 2, 2));
+    cow.setScale(Vector(10, 10, 10));
+    cow.setTranslation(Vector(-10, 10, 2));
 	meshList.push_back(&tr);
+	meshList.push_back(&cow);
 
     init();
 	glutMainLoop();

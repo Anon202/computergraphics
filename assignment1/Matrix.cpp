@@ -167,7 +167,8 @@ namespace algebra {
         m.e[3] = 0.0;     m.e[7] = 0.0;     m.e[11] = 0.0;      m.e[15] = 1.0;
         return m;
     }
-
+   
+    /* Rodrigues' Rotation */
     Matrix Matrix::rotationAroundAxis(Vector v, float rad) {
         Matrix m = Matrix();
         Vector u = v.normalized();

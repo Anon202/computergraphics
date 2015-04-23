@@ -169,5 +169,8 @@ Mesh Mesh::Load(string model_name) {
             // ignore for now
         }
     }
+    
+    fclose(file);
+    
     return Mesh(nv, nt, &vArr[0], &tArr[0]);
 }

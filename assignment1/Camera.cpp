@@ -73,5 +73,5 @@ Matrix Camera::LookAt() {
     m.e[1] = up.x;      m.e[5] = up.y;      m.e[ 9] = up.z;      m.e[13] = 0.0;
     m.e[2] = viewdir.x; m.e[6] = viewdir.y; m.e[10] = viewdir.z; m.e[14] = 0.0;
     m.e[3] = 0.0;       m.e[7] = 0.0;       m.e[11] = 0.0;       m.e[15] = 1.0;
-    return m * Matrix::Translation(this->position.ScalarMult(-1));
+    return m * Matrix::Translation(-this->position);
 }

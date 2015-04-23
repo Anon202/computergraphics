@@ -45,10 +45,7 @@ void Vector::Print(const char *name) {
 }
 
 Vector Vector::operator-() {
-    this->x = -this->x;
-    this->y = -this->y;
-    this->z = -this->z;
-    return *this;
+    return this->ScalarMult(-1);
 }
 
 Vector Vector::operator-(const Vector& rhs) {

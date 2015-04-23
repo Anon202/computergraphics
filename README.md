@@ -10,3 +10,9 @@ Requires OpenGL 4.3+, freeGLUT and GLEW.
 $ make
 $ ./computergraphics
 ```
+
+In my Arch Linux installation with Bumblebee, to run I do
+
+```
+$ optirun ./computergraphics
+```

@@ -49,9 +49,9 @@ void prepareShaderProgram() {
 
 
 void prepareMesh(Mesh* mesh) {
-	int sizeVerts = mesh->nvertices() * 3 * sizeof(float);
-	int sizeCols = mesh->nvertices() * 3 * sizeof(float);
-	int sizeTris = mesh->ntriangles() * 3 * sizeof(int);
+	int sizeVerts = mesh->NumVertices() * 3 * sizeof(float);
+	int sizeCols = mesh->NumVertices() * 3 * sizeof(float);
+	int sizeTris = mesh->NumTriangles() * 3 * sizeof(int);
 
 	// Allocate GPU buffer and load mesh data
 	glGenBuffers(1, &mesh->vbo);
@@ -74,7 +74,7 @@ void renderMesh(Mesh* mesh) {
 	
 	// Assignment 1: Apply the transforms from local mesh coordinates to world coordinates here
 	// Combine it with the viewing transform that is pass to the shader below
-    Matrix PVW = PV * mesh->transformationMatrix();
+    Matrix PVW = PV * mesh->TransformationMatrix();
 
 	// Pass the viewing transform to the shader
     GLint loc_PV = glGetUniformLocation(shprg, "PV");
@@ -94,7 +94,7 @@ void renderMesh(Mesh* mesh) {
 	GLint vNorm = glGetAttribLocation(shprg, "vNorm");
 	glEnableVertexAttribArray(vNorm);
 	glVertexAttribPointer(vNorm, 3, GL_FLOAT, GL_FALSE, 0,
-            (void *)(mesh->nvertices() * 3 *sizeof(float)));
+            (void *)(mesh->NumVertices() * 3 *sizeof(float)));
 	
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
@@ -105,7 +105,7 @@ void renderMesh(Mesh* mesh) {
     glDepthFunc(GL_LESS);
 
 	// Draw all triangles
-	glDrawElements(GL_TRIANGLES, mesh->ntriangles() * 3, GL_UNSIGNED_INT, NULL); 
+	glDrawElements(GL_TRIANGLES, mesh->NumTriangles() * 3, GL_UNSIGNED_INT, NULL); 
 }
 
 void display(void) {
@@ -114,18 +114,18 @@ void display(void) {
 	// Assignment1: Calculate the transform to view coordinates yourself 
 	// Replace this hard-coded transform. 
 	// M should be calculated from camera parameters
-    Matrix V = cam.lookAt();
+    Matrix V = cam.LookAt();
     
     // Assignment1: Calculate the projection transform yourself 
 	// Replace this hard-coded transform. 	
 	// P should be calculated from camera parameters
     float aspect = (float)screen_width / screen_height;
-    P = Matrix::perspectiveProj(cam.nearPlane, cam.farPlane, cam.fov, aspect);
+    P = Matrix::PerspectiveProj(cam.near_plane, cam.far_plane, cam.fov, aspect);
 
     if (use_parallel_proj) {
-        P = Matrix::parallelProj(screen_height/40.0,
+        P = Matrix::ParallelProj(screen_height/40.0,
                 screen_width/40.0, -screen_height/40.0,
-                -screen_width/40.0, cam.nearPlane, cam.farPlane);
+                -screen_width/40.0, cam.near_plane, cam.far_plane);
     }
 
     PV = P * V;
@@ -239,11 +239,11 @@ int main(int argc, char **argv) {
 	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl << endl;
 
 	// Insert the 3D models you want in your scene here in a vector of meshes
-    Mesh tr = Mesh::load("models/triceratops.obj");
-    Mesh cow = Mesh::load("models/cow.obj");
-    tr.setScale(Vector(2, 2, 2));
-    cow.setScale(Vector(10, 10, 10));
-    cow.setTranslation(Vector(-10, 10, 2));
+    Mesh tr = Mesh::Load("models/triceratops.obj");
+    Mesh cow = Mesh::Load("models/cow.obj");
+    tr.SetScale(Vector(2, 2, 2));
+    cow.SetScale(Vector(10, 10, 10));
+    cow.SetTranslation(Vector(-10, 10, 2));
 	meshList.push_back(&tr);
 	meshList.push_back(&cow);
 

@@ -3,11 +3,11 @@
 
 #include <cmath>
 
-float radToDeg(float rad) {
+float RadToDeg(float rad) {
     return rad * 180.0/M_PI;
 }
 
-float degToRad(float deg) {
+float DegToRad(float deg) {
     return deg * M_PI/180.0;
 }
 

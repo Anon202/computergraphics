@@ -34,41 +34,41 @@ Mesh::Mesh(int nv, int nt, float *vArr, int *tArr) : nv(nv), nt(nt) {
         Vector ab = this->vertices[t.vInds[1]] - this->vertices[t.vInds[0]];
         Vector ac = this->vertices[t.vInds[2]] - this->vertices[t.vInds[0]];
         for (int j = 0; j < 3; j++) {
-            this->vnorms[t.vInds[j]] += ab.cross(ac).normalized();
+            this->vnorms[t.vInds[j]] += ab.Cross(ac).Normalized();
         }
     }
     for (int i = 0; i < nv; i++) {
-        this->vnorms[i] = this->vnorms[i].normalized();
+        this->vnorms[i] = this->vnorms[i].Normalized();
     }
 
 }
 
-int Mesh::nvertices() {
+int Mesh::NumVertices() {
     return this->nv;
 }
 
-int Mesh::ntriangles() {
+int Mesh::NumTriangles() {
     return this->nt;
 }
 
-void Mesh::setScale(Vector scale) {
+void Mesh::SetScale(Vector scale) {
     this->scale = scale;
 }
 
-void Mesh::setRotation(Vector rotation) {
+void Mesh::SetRotation(Vector rotation) {
     this->rotation = rotation;
 }
 
-void Mesh::setTranslation(Vector translation) {
+void Mesh::SetTranslation(Vector translation) {
     this->translation = translation;
 }
 
-Matrix Mesh::transformationMatrix() {
-    return Matrix::translation(translation)
-            * Matrix::rotation('x', rotation.x)
-            * Matrix::rotation('y', rotation.y)
-            * Matrix::rotation('z', rotation.z)
-            * Matrix::scale(scale);
+Matrix Mesh::TransformationMatrix() {
+    return Matrix::Translation(translation)
+            * Matrix::Rotation('x', rotation.x)
+            * Matrix::Rotation('y', rotation.y)
+            * Matrix::Rotation('z', rotation.z)
+            * Matrix::Scale(scale);
 }
 
 void Mesh::Move(char dir) {
@@ -134,7 +134,7 @@ void Mesh::Scale(char dir) {
     }
 }
 
-Mesh Mesh::load(string model_name) {
+Mesh Mesh::Load(string model_name) {
     vector<float> vArr;
     vector<int> tArr;
     int nt = 0, nv = 0, r;

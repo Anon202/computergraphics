@@ -11,12 +11,12 @@ class Camera {
         Vector xdir;
 
     public:
-        const double nearPlane, farPlane, fov;
+        const double near_plane, far_plane, fov;
         Camera(double near, double far, double fov, Vector pos);
         Vector Position();
         Vector ViewDirection();
         Vector Up();
         void Move(char dir);
         void Rotate(char dir);
-        Matrix lookAt();
+        Matrix LookAt();
 };

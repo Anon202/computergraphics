@@ -24,13 +24,13 @@ class Mesh {
         vector<Triangle> triangles;
         unsigned int vbo, ibo, vao; // OpenGL handles for rendering
         Mesh(int nv, int nt, float *vArr, int *tArr);
-        static Mesh load(string model_name);
-        int nvertices();
-        int ntriangles();
-        void setScale(Vector scale);
-        void setRotation(Vector rotation);
-        void setTranslation(Vector scale);
-        Matrix transformationMatrix();
+        static Mesh Load(string model_name);
+        int NumVertices();
+        int NumTriangles();
+        void SetScale(Vector scale);
+        void SetRotation(Vector rotation);
+        void SetTranslation(Vector scale);
+        Matrix TransformationMatrix();
         void Rotate(char dir);
         void Move(char dir);
         void Scale(char dir);

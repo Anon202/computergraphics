@@ -8,19 +8,18 @@ using namespace std;
 namespace algebra {
 
 class Vector {
-private:
 public:
     float x, y, z;
     Vector();
     Vector(float x, float y, float z);
-    Vector add(Vector v);
-    Vector subtract(Vector v);
-    Vector cross(Vector v);
-    float dot(Vector v);
-    float length();
-    Vector normalized();
-    Vector scalarMult(float c);
-    void print(const char *name);    
+    Vector Add(Vector v);
+    Vector Subtract(Vector v);
+    Vector Cross(Vector v);
+    float Dot(Vector v);
+    float Length();
+    Vector Normalized();
+    Vector ScalarMult(float c);
+    void Print(const char *name);    
     Vector operator-();
     Vector operator-(const Vector& rhs);
     Vector operator+(const Vector& rhs);

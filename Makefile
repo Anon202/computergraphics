@@ -4,7 +4,7 @@ INCLUDES := -I/usr/include/GL/
 LDFLAGS := -lm -lGL -lGLEW -lglut 
 SRCS := main.cpp Mesh.cpp Vector.cpp HomVector.cpp Matrix.cpp Camera.cpp 
 OBJS := $(SRCS:.cpp=.o)
-MAIN := assignment1
+MAIN := assignment
 
 all: $(MAIN)
 

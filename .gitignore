@@ -3,7 +3,7 @@
 *.lo
 *.o
 *.obj
-!assignment1/models/*.obj
+!models/*.obj
 
 # Precompiled Headers
 *.gch
@@ -27,7 +27,7 @@
 *.exe
 *.out
 *.app
-assignment1/assignment1
+assignment
 
 # Others
 other/

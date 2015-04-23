@@ -150,7 +150,7 @@ namespace algebra {
         Matrix m = Matrix();
         float fov = DegToRad(fovdeg);
         float t = n*tan(fov/2);
-        float r = t*aspect;;
+        float r = t*aspect;
         float b = -t;
         float l = -r;
         m.e[0] = 2*n/(r-l); m.e[4] = 0.0;       m.e[ 8] = (r+l)/(r-l); m.e[12] = 0.0;

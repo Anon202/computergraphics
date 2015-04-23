@@ -99,9 +99,9 @@ void renderMesh(Mesh* mesh) {
 	// To accomplish wireframe rendering (can be removed to get filled triangles)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
     // Enable Z-buffer
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glDepthMask(GL_TRUE);
+    glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
 	// Draw all triangles

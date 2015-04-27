@@ -11,7 +11,7 @@ $ make
 $ ./computergraphics
 ```
 
-In my Arch Linux installation with Bumblebee, to run I do
+To run it on my Arch Linux installation with Bumblebee, I do
 
 ```
 $ optirun ./computergraphics

@@ -23,9 +23,9 @@ Vector Camera::Up() {
 }
 
 void Camera::Move(char dir) {
-    float f = 1;
+    float f = 0.1;
     if (dir < 'A' || dir > 'Z') {
-        f = -1;
+        f = -0.1;
     }
     switch (dir) {
         case 'x': case 'X':

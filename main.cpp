@@ -5,11 +5,11 @@
 #include <freeglut.h>
 #include <vector>
 
+#include "shaders.h"
 #include "Matrix.h"
 #include "Vector.h"
-#include "shaders.h"
-#include "Mesh.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 using namespace std;
 using namespace algebra;
@@ -21,7 +21,7 @@ bool moving_cam = true;
 bool use_parallel_proj = false;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
-Camera cam = Camera(1, 10000, 60, Vector(0, 0, 20)); // Setup the camera parameters
+Camera cam = Camera(1, 10000, 60, Vector(0, 0, 5)); // Setup the camera parameters
 GLuint shprg; // Shader program id
 
 // Transform matrices
@@ -96,10 +96,14 @@ void renderMesh(Mesh* mesh) {
 	glVertexAttribPointer(vNorm, 3, GL_FLOAT, GL_FALSE, 0,
             (void *)(mesh->NumVertices() * 3 *sizeof(float)));
 	
-	// To accomplish wireframe rendering (can be removed to get filled triangles)
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    if (mesh->IsBounding()) {
+	    // To accomplish wireframe rendering
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+    }
     // Enable Z-buffer
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
@@ -134,6 +138,7 @@ void display(void) {
    
     for (unsigned int i = 0; i < meshList.size(); i++) {
         renderMesh(meshList[i]);
+        renderMesh(meshList[i]->bounding_volume);
     }
 
 	glFlush();
@@ -196,6 +201,7 @@ void init(void) {
 	// Setup OpenGL buffers for rendering of the meshes
     for (unsigned int i = 0; i < meshList.size(); i++) {
         prepareMesh(meshList[i]);
+        prepareMesh(meshList[i]->bounding_volume);
     }
 	
 	// Compile and link shader program
@@ -239,11 +245,12 @@ int main(int argc, char **argv) {
 	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl << endl;
 
 	// Insert the 3D models you want in your scene here in a vector of meshes
-    Mesh tr = Mesh::Load("models/triceratops.obj");
-    Mesh cow = Mesh::Load("models/cow.obj");
-    tr.SetScale(Vector(2, 2, 2));
-    cow.SetScale(Vector(10, 10, 10));
-    cow.SetTranslation(Vector(-10, 10, 2));
+    Mesh::BoundingType(Mesh::SPHERE_BOUNDING);
+    Mesh tr = Mesh::Load("models/sphere.obj", false);
+    Mesh cow = Mesh::Load("models/cow.obj", false);
+    tr.Scale(Vector(2, 2, 2));
+    //cow.Scale(Vector(10, 10, 10));
+    cow.Move(Vector(-10, 10, 2));
 	meshList.push_back(&tr);
 	meshList.push_back(&cow);
 

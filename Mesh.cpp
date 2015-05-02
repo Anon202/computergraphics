@@ -1,9 +1,31 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <limits>
 #include "Mesh.h"
 
-Mesh::Mesh(int nv, int nt, float *vArr, int *tArr) : nv(nv), nt(nt) {
+int Mesh::bounding_type = Mesh::SPHERE_BOUNDING;
+
+Mesh::Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles, bool is_bounding) {
+    this->nv = vertices.size();
+    this->nt = triangles.size();
+    this->vertices.resize(this->nv);
+    this->vnorms.resize(this->nv);
+    this->triangles.resize(this->nt);
+    this->vertices = vertices;
+    this->vnorms = vnorms;
+    this->triangles = triangles;
+    this->scale = Vector(1, 1, 1);
+    this->rotation = Vector(0, 0, 0);
+    this->translation = Vector(0, 0, 0);
+  
+    this->is_bounding = is_bounding;
+    if (!is_bounding) {
+        this->ComputeBoundingSphere();
+    }
+}
+
+Mesh::Mesh(int nv, int nt, float *vArr, int *tArr, bool is_bounding) : nv(nv), nt(nt) {
     this->vertices.resize(nv);
     this->vnorms.resize(nv);
     this->triangles.resize(nt);
@@ -40,9 +62,20 @@ Mesh::Mesh(int nv, int nt, float *vArr, int *tArr) : nv(nv), nt(nt) {
     for (int i = 0; i < nv; i++) {
         this->vnorms[i] = this->vnorms[i].Normalized();
     }
-
+  
+    this->is_bounding = is_bounding;
+    if (!is_bounding) {
+        this->ComputeBoundingSphere();
+    }
 }
 
+void Mesh::BoundingType(int bounding_type) {
+    bounding_type = bounding_type;
+}
+
+int Mesh::BoundingType() {
+    return bounding_type;
+}
 int Mesh::NumVertices() {
     return this->nv;
 }
@@ -51,16 +84,8 @@ int Mesh::NumTriangles() {
     return this->nt;
 }
 
-void Mesh::SetScale(Vector scale) {
-    this->scale = scale;
-}
-
-void Mesh::SetRotation(Vector rotation) {
-    this->rotation = rotation;
-}
-
-void Mesh::SetTranslation(Vector translation) {
-    this->translation = translation;
+bool Mesh::IsBounding() {
+    return this->is_bounding;
 }
 
 Matrix Mesh::TransformationMatrix() {
@@ -72,9 +97,39 @@ Matrix Mesh::TransformationMatrix() {
 }
 
 void Mesh::Move(char dir) {
-    int f = 1;
+    this->Move(dir, 1.0);
+}
+
+void Mesh::Rotate(char dir) {
+    this->Rotate(dir, 1.0);
+}
+
+void Mesh::Scale(char dir) {
+    this->Scale(dir, 1.0);
+}
+
+void Mesh::Move(Vector v) {
+    this->Move('x', v.x);
+    this->Move('y', v.y);
+    this->Move('z', v.z);
+}
+
+void Mesh::Rotate(Vector v) {
+    this->Rotate('x', v.x);
+    this->Rotate('y', v.y);
+    this->Rotate('z', v.z);
+}
+
+void Mesh::Scale(Vector v) {
+    this->Scale('x', v.x);
+    this->Scale('y', v.y);
+    this->Scale('z', v.z);
+}
+
+void Mesh::Move(char dir, float units) {
+    float f = -units;
     if (dir < 'A' || dir > 'Z') {
-        f = -1;
+        f = units;
     }
     switch (dir) {
         case 'x': case 'X':
@@ -90,12 +145,15 @@ void Mesh::Move(char dir) {
             // TODO: throw exception
             break;
     }
+    if (!this->is_bounding) {
+        this->bounding_volume->Move(dir, units);
+    }
 }
 
-void Mesh::Rotate(char dir) {
-    int f = 1;
+void Mesh::Rotate(char dir, float units) {
+    float f = units;
     if (dir < 'A' || dir > 'Z') {
-        f = -1;
+        f = -units;
     }
     switch (dir) {
         case 'i': case 'I':
@@ -111,12 +169,15 @@ void Mesh::Rotate(char dir) {
             // TODO: throw exception
             break;
     }
+    if (!this->is_bounding) {
+        this->bounding_volume->Rotate(dir, units);
+    }
 }
 
-void Mesh::Scale(char dir) {
-    int f = 1;
+void Mesh::Scale(char dir, float units) {
+    float f = units;
     if (dir < 'A' || dir > 'Z') {
-        f = -1;
+        f = -units;
     }
     switch (dir) {
         case 'x': case 'X':
@@ -132,9 +193,12 @@ void Mesh::Scale(char dir) {
             // TODO: throw exception
             break;
     }
+    if (!this->is_bounding) {
+        this->bounding_volume->Scale(dir, units);
+    }
 }
 
-Mesh Mesh::Load(string model_name) {
+Mesh Mesh::Load(string model_name, bool is_bounding) {
     vector<float> vArr;
     vector<int> tArr;
     int nt = 0, nv = 0, r;
@@ -172,5 +236,58 @@ Mesh Mesh::Load(string model_name) {
     
     fclose(file);
     
-    return Mesh(nv, nt, &vArr[0], &tArr[0]);
+    return Mesh(nv, nt, &vArr[0], &tArr[0], is_bounding);
+}
+
+float d(Vector a, Vector b) {
+    return (a - b).Length();
+}
+
+void Mesh::ComputeBoundingSphere() {
+    Vector xmax = Vector(std::numeric_limits<float>::min(), 0, 0);
+    Vector xmin = Vector(std::numeric_limits<float>::max(), 0, 0);
+    Vector ymax = Vector(0, std::numeric_limits<float>::min(), 0);
+    Vector ymin = Vector(0, std::numeric_limits<float>::max(), 0);
+    Vector zmax = Vector(0, 0, std::numeric_limits<float>::min());
+    Vector zmin = Vector(0, 0, std::numeric_limits<float>::max());
+    for (unsigned int i = 0; i < this->vertices.size(); i++) {
+        if (this->vertices[i].x > xmax.x) xmax = this->vertices[i];
+        if (this->vertices[i].y > ymax.y) ymax = this->vertices[i];
+        if (this->vertices[i].z > zmax.z) zmax = this->vertices[i];
+        if (this->vertices[i].x < xmin.x) xmin = this->vertices[i];
+        if (this->vertices[i].y < ymin.y) ymin = this->vertices[i];
+        if (this->vertices[i].z < zmin.z) zmin = this->vertices[i];
+    }
+    Vector p1 = xmin, p2 = xmax;
+    if (d(p1, p2) < d(ymin, ymax)) {
+        p1 = ymin;
+        p2 = ymax;
+    }
+    if (d(p1, p2) < d(zmin, zmax)) {
+        p1 = zmin;
+        p2 = zmax;
+    }
+    Vector center = (p1 + p2).ScalarMult(0.5);
+    float rad = d(p1, p2)/2;
+    for (unsigned int i = 0; i < this->vertices.size(); i++) {
+        float dist = d(center, this->vertices[i]);
+        if (dist > rad) {
+            rad = (rad + dist)/2;
+            center = (center.ScalarMult(rad) + this->vertices[i].ScalarMult(dist-rad)).ScalarMult(1/dist);
+        }
+    }
+    Mesh tmp = Mesh::Load("models/sphere.obj", true);
+    this->bounding_sphere.radius = rad;
+    this->bounding_sphere.center = center;
+    this->bounding_volume = new Mesh(tmp.vertices, tmp.vnorms, tmp.triangles, true);
+    this->bounding_volume->translation = Vector(center.x, center.y, center.z);
+    this->bounding_volume->scale = Vector(rad, rad, rad);
+}
+
+float Mesh::BoundingSphereRadius() {
+    return this->bounding_sphere.radius;
+}
+
+Vector Mesh::BoundingSphereCenter() {
+    return this->bounding_sphere.center;
 }

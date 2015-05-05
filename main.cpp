@@ -8,6 +8,7 @@
 #include "shaders.h"
 #include "Matrix.h"
 #include "Vector.h"
+#include "HomVector.h"
 #include "Camera.h"
 #include "Mesh.h"
 
@@ -21,7 +22,7 @@ bool moving_cam = true;
 bool use_parallel_proj = false;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
-Camera cam = Camera(1, 10000, 60, Vector(0, 0, 5)); // Setup the camera parameters
+Camera cam = Camera(1, 10000, 60, Vector(0, 0, 10)); // Setup the camera parameters
 GLuint shprg; // Shader program id
 
 // Transform matrices
@@ -29,7 +30,14 @@ GLuint shprg; // Shader program id
 // P is the projection transform
 // PV = P * V
 Matrix V, P, PV;
-
+Vector planes[6] = {
+    Vector(1,0,0),
+    Vector(-1,0,0),
+    Vector(0,1,0),
+    Vector(0,-1,0),
+    Vector(0,0,1),
+    Vector(0,0,-1)
+};
 
 void prepareShaderProgram() {
 	shprg = glCreateProgram();
@@ -136,9 +144,29 @@ void display(void) {
 
 	glUseProgram(shprg);
    
+    bool nothing_to_render = true;
     for (unsigned int i = 0; i < meshList.size(); i++) {
-        renderMesh(meshList[i]);
-        renderMesh(meshList[i]->bounding_volume);
+        Matrix PVW = PV * meshList[i]->TransformationMatrix();
+        Vector center = PVW * meshList[i]->BoundingSphereCenter();
+        bool draw = true;
+        for (int j = 0; j < 6; j++) {
+            HomVector v = PVW.Transposed().MultiplyH(planes[j]);
+            Vector normal = Vector(v.x, v.y, v.z).Normalized();
+            float distance = v.w / Vector(v.x, v.y, v.z).Length();
+            if (normal.Dot(center) + distance <= -meshList[i]->BoundingSphereRadius()) {
+                draw = false;
+                break;
+            }
+        }
+        if (draw) {
+            cout << "Rendering object #" << i << endl;
+            renderMesh(meshList[i]);
+            renderMesh(meshList[i]->bounding_volume);
+            nothing_to_render = false;
+        }
+    }
+    if (nothing_to_render) {
+        cout << "Nothing to render" << endl;
     }
 
 	glFlush();
@@ -248,7 +276,7 @@ int main(int argc, char **argv) {
     Mesh::BoundingType(Mesh::SPHERE_BOUNDING);
     Mesh tr = Mesh::Load("models/sphere.obj", false);
     Mesh cow = Mesh::Load("models/cow.obj", false);
-    tr.Scale(Vector(2, 2, 2));
+    tr.Scale(Vector(0.5, 0.5, 0.5));
     //cow.Scale(Vector(10, 10, 10));
     cow.Move(Vector(-10, 10, 2));
 	meshList.push_back(&tr);

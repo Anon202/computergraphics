@@ -27,7 +27,17 @@ namespace algebra {
         }
         e[j*4 + i] = x;
     }
-    
+   
+    Matrix Matrix::Transposed() {
+        Matrix m;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                m.Set(j, i, this->Get(i, j));
+            }
+        }
+        return m;
+    }
+
     Matrix Matrix::Multiply(Matrix m) {
         Matrix r = Matrix();
 	    for (int i = 0; i < 4; i++) {

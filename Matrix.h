@@ -16,6 +16,7 @@ public:
     Matrix(float e[16]);
     float Get(int i, int j) const;
     void Set(int i, int j, float x);
+    Matrix Transposed();
     Matrix Multiply(Matrix m);
     Vector Multiply(Vector v);
     Matrix Multiply(float c);

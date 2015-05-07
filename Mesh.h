@@ -13,6 +13,7 @@ typedef struct _Triangle {
 typedef struct _BoundingSphere {
     float radius;
     Vector center;
+    Vector original_center;
 } BoundingSphere;
 
 class Mesh {
@@ -27,6 +28,7 @@ class Mesh {
         Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles, bool is_bounding);
         Mesh(int nv, int nt, float *vArr, int *tArr, bool is_bounding);
         void ComputeBoundingSphere();
+        void UpdateBoundingVolume();
 
     public:
         static const int SPHERE_BOUNDING = 0;
@@ -51,6 +53,7 @@ class Mesh {
         void Rotate(Vector v);
         void Move(Vector v);
         void Scale(Vector v);
+        void UniformScale(bool enlarge);
         float BoundingSphereRadius();
         Vector BoundingSphereCenter();
 };

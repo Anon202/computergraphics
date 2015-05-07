@@ -4,6 +4,8 @@
 #include <glew.h>
 #include <freeglut.h>
 #include <vector>
+#include <ctime>
+#include <cstring>
 
 #include "shaders.h"
 #include "Matrix.h"
@@ -20,6 +22,7 @@ int screen_height = 768;
 int selected_obj = 0;
 bool moving_cam = true;
 bool use_parallel_proj = false;
+bool frustum_culling = true;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 10)); // Setup the camera parameters
@@ -121,7 +124,9 @@ void renderMesh(Mesh* mesh) {
 }
 
 void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+    clock_t start = clock();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		
 	// Assignment1: Calculate the transform to view coordinates yourself 
 	// Replace this hard-coded transform. 
@@ -143,33 +148,41 @@ void display(void) {
     PV = P * V;
 
 	glUseProgram(shprg);
-   
-    bool nothing_to_render = true;
-    for (unsigned int i = 0; i < meshList.size(); i++) {
-        Matrix PVW = PV * meshList[i]->TransformationMatrix();
-        Vector center = PVW * meshList[i]->BoundingSphereCenter();
-        bool draw = true;
-        for (int j = 0; j < 6; j++) {
-            HomVector v = PVW.Transposed().MultiplyH(planes[j]);
-            Vector normal = Vector(v.x, v.y, v.z).Normalized();
-            float distance = v.w / Vector(v.x, v.y, v.z).Length();
-            if (normal.Dot(center) + distance <= -meshList[i]->BoundingSphereRadius()) {
-                draw = false;
-                break;
+    if (frustum_culling) {
+        bool nothing_to_render = true;
+        for (unsigned int i = 0; i < meshList.size(); i++) {
+            Matrix PVW = PV * meshList[i]->TransformationMatrix();
+            Vector center = PVW * meshList[i]->BoundingSphereCenter();
+            bool draw = true;
+            for (int j = 0; j < 6; j++) {
+                HomVector v = PVW.Transposed().MultiplyH(planes[j]);
+                Vector normal = Vector(v.x, v.y, v.z).Normalized();
+                float distance = v.w / Vector(v.x, v.y, v.z).Length();
+                if (normal.Dot(center) + distance <= -meshList[i]->BoundingSphereRadius()) {
+                    draw = false;
+                    break;
+                }
+            }
+            if (draw) {
+                cout << "Rendering object #" << i << endl;
+                renderMesh(meshList[i]);
+                renderMesh(meshList[i]->bounding_volume);
+                nothing_to_render = false;
             }
         }
-        if (draw) {
-            cout << "Rendering object #" << i << endl;
-            renderMesh(meshList[i]);
-            renderMesh(meshList[i]->bounding_volume);
-            nothing_to_render = false;
+
+        if (nothing_to_render) {
+            cout << "Nothing to render" << endl;
         }
-    }
-    if (nothing_to_render) {
-        cout << "Nothing to render" << endl;
+    } else {
+        for (unsigned int i = 0; i < meshList.size(); i++) {
+            renderMesh(meshList[i]);
+        }
     }
 
 	glFlush();
+    
+    cout << "Rendering time: " << (std::clock() - start)/(double)(CLOCKS_PER_SEC/1000) << " ms" << endl;
 }
 
 void changeSize(int w, int h) {
@@ -188,6 +201,9 @@ void keypress(unsigned char key, int x, int y) {
         return;
     }
     switch(key) {
+    case 'o': case 'O':
+        frustum_culling = !frustum_culling;
+        break;
     case 'p': case 'P':
         use_parallel_proj = !use_parallel_proj;
         break;
@@ -210,11 +226,7 @@ void keypress(unsigned char key, int x, int y) {
     case 'e': case 'E':
     case 'r': case 'R':
         if (!moving_cam) {
-            char dir = key;
-            if (dir >= 'A' && dir <= 'Z') dir = key - 'A' + 'a';
-            dir = (dir == 'w')? 'x' : ((dir == 'e')? 'y' : 'z');
-            if (key >= 'A' && key <= 'Z') dir = dir - 'a' + 'A';
-            meshList[selected_obj]->Scale(dir);
+            meshList[selected_obj]->UniformScale(key >= 'A' && key <= 'Z');
         }
         break;
 	case 'Q':
@@ -274,13 +286,25 @@ int main(int argc, char **argv) {
 
 	// Insert the 3D models you want in your scene here in a vector of meshes
     Mesh::BoundingType(Mesh::SPHERE_BOUNDING);
-    Mesh tr = Mesh::Load("models/sphere.obj", false);
+    Mesh tr = Mesh::Load("models/triceratops.obj", false);
     Mesh cow = Mesh::Load("models/cow.obj", false);
     tr.Scale(Vector(0.5, 0.5, 0.5));
-    //cow.Scale(Vector(10, 10, 10));
+    cow.Scale(Vector(20, 20, 20));
     cow.Move(Vector(-10, 10, 2));
 	meshList.push_back(&tr);
 	meshList.push_back(&cow);
+
+    vector<Mesh> benchmark_meshes;
+    if (argc == 2 && strcmp("--benchmark", argv[1]) == 0) { 
+        int num_objs = 10000;
+        for (int i = 0; i < num_objs; i++) {
+            benchmark_meshes.push_back(Mesh::Load("models/sphere.obj", false));
+        }
+        for (int i = -(num_objs/2); i < num_objs/2; i++) {
+            benchmark_meshes[i+num_objs/2].Move(Vector(20*i+20, 0, 0));
+            meshList.push_back(&benchmark_meshes[i+num_objs/2]);
+        }
+    }
 
     init();
 	glutMainLoop();

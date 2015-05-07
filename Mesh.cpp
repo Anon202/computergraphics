@@ -169,9 +169,7 @@ void Mesh::Rotate(char dir, float units) {
             // TODO: throw exception
             break;
     }
-    if (!this->is_bounding) {
-        this->bounding_volume->Rotate(dir, units);
-    }
+    this->UpdateBoundingVolume();
 }
 
 void Mesh::Scale(char dir, float units) {
@@ -193,9 +191,25 @@ void Mesh::Scale(char dir, float units) {
             // TODO: throw exception
             break;
     }
+    this->UpdateBoundingVolume();
+}
+
+void Mesh::UniformScale(bool enlarge) {
+    int f = (enlarge)? 1 : -1;
+    this->scale = this->scale + Vector(f*0.02, f*0.02, f*0.02);
+    this->UpdateBoundingVolume();
+}
+
+void Mesh::UpdateBoundingVolume() {
     if (!this->is_bounding) {
-        this->bounding_volume->Scale(dir, units);
-    }
+        this->bounding_sphere.center = Matrix::Rotation('x', this->rotation.x) *
+                                       Matrix::Rotation('y', this->rotation.y) *
+                                       Matrix::Rotation('z', this->rotation.z) *
+                                       Matrix::Scale(this->scale) *
+                                       this->bounding_sphere.original_center;
+        this->bounding_volume->translation = this->bounding_sphere.center + this->translation; 
+        this->bounding_volume->scale = this->scale.ScalarMult(this->bounding_sphere.radius);
+    } 
 }
 
 Mesh Mesh::Load(string model_name, bool is_bounding) {
@@ -282,6 +296,7 @@ void Mesh::ComputeBoundingSphere() {
     this->bounding_volume = new Mesh(tmp.vertices, tmp.vnorms, tmp.triangles, true);
     this->bounding_volume->translation = Vector(center.x, center.y, center.z);
     this->bounding_volume->scale = Vector(rad, rad, rad);
+    this->bounding_sphere.original_center = center;
 }
 
 float Mesh::BoundingSphereRadius() {

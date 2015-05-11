@@ -6,8 +6,8 @@
 #include <vector>
 #include <ctime>
 #include <cstring>
+#include <fstream>
 
-#include "shaders.h"
 #include "Matrix.h"
 #include "Vector.h"
 #include "HomVector.h"
@@ -22,7 +22,8 @@ int screen_height = 768;
 int selected_obj = 0;
 bool moving_cam = true;
 bool use_parallel_proj = false;
-bool frustum_culling = true;
+bool frustum_culling = false;
+string shader = "example";
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 10)); // Setup the camera parameters
@@ -42,15 +43,59 @@ Vector planes[6] = {
     Vector(0,0,-1)
 };
 
+string readShaderFile(const char *file_path) {
+    string content;
+    ifstream fs(file_path, std::ios::in);
+    
+    if (!fs.is_open()) {
+        cerr << "Couldn't open " << file_path << "." << endl;
+        return "";
+    }
+
+    string line = "";
+    while (!fs.eof()) {
+        getline(fs, line);
+        content.append(line + "\n");
+    }
+    fs.close();
+    return content;
+}
+
+void checkSuccessfulCompilation(GLuint shader) {
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE) {
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+        cout << "Error compiling shader:" << endl;
+        for (unsigned int i = 0; i < errorLog.size(); i++) {
+            cout << errorLog[i];
+        }
+        cout << endl;
+        //glDeleteShader(shader); // Don't leak the shader.
+        return;
+    } else {
+        cout << "Shader compiled successfully..." << endl;
+    }
+}
+
 void prepareShaderProgram() {
 	shprg = glCreateProgram();
+	const char* fsfile = ("shaders/" + shader + "fs.glsl").c_str();
+    const char* fs_src = readShaderFile(fsfile).c_str();
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, fs_src, NULL);
+    glShaderSource(fs, 1, &fs_src, NULL);
 	glCompileShader(fs);
+    checkSuccessfulCompilation(fs);
 
+	const char* vsfile = ("shaders/" + shader + "vs.glsl").c_str();
+    const char* vs_src = readShaderFile(vsfile).c_str();
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, vs_src, NULL);
+	glShaderSource(vs, 1, &vs_src, NULL);
 	glCompileShader(vs);
+    checkSuccessfulCompilation(vs);
 
 	glAttachShader(shprg, vs);
 	glAttachShader(shprg, fs);

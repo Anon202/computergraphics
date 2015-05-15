@@ -130,11 +130,11 @@ void renderMesh(Mesh* mesh) {
 	
 	// Assignment 1: Apply the transforms from local mesh coordinates to world coordinates here
 	// Combine it with the viewing transform that is pass to the shader below
-    Matrix PVW = PV * mesh->TransformationMatrix();
+    Matrix PVM = PV * mesh->TransformationMatrix();
 
 	// Pass the viewing transform to the shader
-    GLint loc_PV = glGetUniformLocation(shprg, "PV");
-	glUniformMatrix4fv(loc_PV, 1, GL_FALSE, PVW.e);
+    GLint loc_PVM = glGetUniformLocation(shprg, "PVM");
+	glUniformMatrix4fv(loc_PVM, 1, GL_FALSE, PVM.e);
 
 	// Select current resources 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);

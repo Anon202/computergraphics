@@ -84,14 +84,16 @@ void checkSuccessfulCompilation(GLuint shader) {
 void prepareShaderProgram() {
 	shprg = glCreateProgram();
 	const char* fsfile = ("shaders/" + shader + "fs.glsl").c_str();
-    const char* fs_src = readShaderFile(fsfile).c_str();
+    string fs_str = readShaderFile(fsfile);
+    const char* fs_src = fs_str.c_str();
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, &fs_src, NULL);
 	glCompileShader(fs);
     checkSuccessfulCompilation(fs);
 
 	const char* vsfile = ("shaders/" + shader + "vs.glsl").c_str();
-    const char* vs_src = readShaderFile(vsfile).c_str();
+    string vs_str = readShaderFile(vsfile);
+    const char* vs_src = vs_str.c_str();
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vs, 1, &vs_src, NULL);
 	glCompileShader(vs);

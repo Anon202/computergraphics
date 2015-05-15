@@ -23,7 +23,7 @@ int selected_obj = 0;
 bool moving_cam = true;
 bool use_parallel_proj = false;
 bool frustum_culling = false;
-string shader = "cartoon";
+string shader = "phong";
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 10)); // Setup the camera parameters

@@ -19,12 +19,22 @@ struct MaterialData {
     float shininess;
 };
 
-LightData light0 = LightData(
-    vec3(1.0, 1.0, 1.0),
-    vec3(1.0, 0.0, 0.0),
-    vec3(1.0, 0.0, 0.0),
-    vec3(1.0, 1.0, 1.0)
-);
+
+
+LightData[2] lights = {
+    LightData(
+        vec3(1.0, 1.0, 1.0),
+        vec3(1.0, 0.0, 0.0),
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.5, 0.5, 0.5)
+    ),
+    LightData(
+        vec3(0.0, 1.0, -1.0),
+        vec3(0.5, 0.0, 0.0),
+        vec3(0.5, 0.5, 0.0),
+        vec3(0.3, 0.3, 0.3)
+    )
+};
 
 MaterialData material = MaterialData(
     vec3(0.2, 0.0, 0.0),
@@ -39,13 +49,18 @@ void main(void) {
     vec3 n = vec3(PVM * vec4(vNorm, 0.0));
     vec4 v4 = PVM * vec4(vPos, 1.0);
     vec3 v = vec3(v4) / v4.w;
-    vec3 l = normalize(light0.position - v);
-    vec3 r = reflect(-l, n);
-    v = normalize(-v); 
+    vec3 acc_color = vec3(0, 0, 0);
+
+    for (int i = 0; i < 2; i++) {
+        vec3 l = normalize(lights[i].position - v);
+        vec3 r = reflect(-l, n);
+        v = normalize(-v); 
     
-    vec3 ambient = material.ambient * light0.ambient;
-    vec3 diffuse = material.diffuse * light0.diffuse * max(dot(n, l), 0.0);
-    vec3 specular = material.specular * light0.specular * 
+        vec3 ambient = material.ambient * lights[i].ambient;
+        vec3 diffuse = material.diffuse * lights[i].diffuse * max(dot(n, l), 0.0);
+        vec3 specular = material.specular * lights[i].specular * 
                     pow(max(dot(r, v), 0.0), material.shininess);
-    color = vec4(ambient + diffuse + specular, 1.0);
+        acc_color += ambient + diffuse + specular;
+    }
+    color = vec4(acc_color, 1.0);
 }

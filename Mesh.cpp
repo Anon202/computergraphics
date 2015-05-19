@@ -185,7 +185,6 @@ void Mesh::Scale(char dir, float units) {
     if (dir < 'A' || dir > 'Z') {
         f = units;
     }
-    cout << this->scale << endl;
     switch (dir) {
         case 'x': case 'X':
             this->scale.x += f;

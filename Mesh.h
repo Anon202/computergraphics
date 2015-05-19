@@ -16,6 +16,13 @@ typedef struct _BoundingSphere {
     Vector original_center;
 } BoundingSphere;
 
+typedef struct _Material {
+    Vector ambient;
+    Vector diffuse;
+    Vector specular;
+    float shininess;
+} Material;
+
 class Mesh {
     private:
         static int bounding_type;
@@ -25,8 +32,10 @@ class Mesh {
         Vector translation;
         Vector scale;
         BoundingSphere bounding_sphere;
-        Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles, bool is_bounding);
-        Mesh(int nv, int nt, float *vArr, int *tArr, bool is_bounding);
+        Material material;
+        Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles,
+             Material material, bool is_bounding);
+        Mesh(int nv, int nt, float *vArr, int *tArr, Material material, bool is_bounding);
         void ComputeBoundingSphere();
         void UpdateBoundingVolume();
 
@@ -42,6 +51,7 @@ class Mesh {
         static int BoundingType();
         int NumVertices();
         int NumTriangles();
+        Material MaterialProperties();
         bool IsBounding();
         Matrix TransformationMatrix();
         void Rotate(char dir);

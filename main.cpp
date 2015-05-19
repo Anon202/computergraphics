@@ -142,6 +142,22 @@ void renderMesh(Mesh* mesh) {
     GLint loc_PVM = glGetUniformLocation(shprg, "PVM");
 	glUniformMatrix4fv(loc_PVM, 1, GL_FALSE, PVM.e);
 
+    // Pass the material properties to the shader
+    Material material = mesh->MaterialProperties();
+
+    GLint loc_mAmbient = glGetUniformLocation(shprg, "mAmbient");
+    glUniform3f(loc_mAmbient, material.ambient.x, material.ambient.y, material.ambient.z);
+    
+    GLint loc_mDiffuse = glGetUniformLocation(shprg, "mDiffuse");
+    glUniform3f(loc_mDiffuse, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+    
+    GLint loc_mSpecular = glGetUniformLocation(shprg, "mSpecular");
+    glUniform3f(loc_mSpecular, material.specular.x, material.specular.y, material.specular.z);
+    
+    GLint loc_mShininess = glGetUniformLocation(shprg, "mShininess");
+    glUniform1f(loc_mShininess, material.shininess);
+    
+
 	// Select current resources 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 	glBindBuffer(GL_VERTEX_ARRAY, mesh->vao);

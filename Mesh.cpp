@@ -6,7 +6,8 @@
 
 int Mesh::bounding_type = Mesh::SPHERE_BOUNDING;
 
-Mesh::Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles, bool is_bounding) {
+Mesh::Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> triangles,
+        Material material, bool is_bounding) {
     this->nv = vertices.size();
     this->nt = triangles.size();
     this->vertices.resize(this->nv);
@@ -18,21 +19,24 @@ Mesh::Mesh(vector<Vector> vertices, vector<Vector> vnorms, vector<Triangle> tria
     this->scale = Vector(1, 1, 1);
     this->rotation = Vector(0, 0, 0);
     this->translation = Vector(0, 0, 0);
-  
+    this->material = material;
+
     this->is_bounding = is_bounding;
     if (!is_bounding) {
         this->ComputeBoundingSphere();
     }
 }
 
-Mesh::Mesh(int nv, int nt, float *vArr, int *tArr, bool is_bounding) : nv(nv), nt(nt) {
+Mesh::Mesh(int nv, int nt, float *vArr, int *tArr, Material material,
+        bool is_bounding) : nv(nv), nt(nt) {
     this->vertices.resize(nv);
     this->vnorms.resize(nv);
     this->triangles.resize(nt);
     this->scale = Vector(1, 1, 1);
     this->rotation = Vector(0, 0, 0);
     this->translation = Vector(0, 0, 0);
-	
+    this->material = material;
+
     // set mesh vertices
 	for (int i = 0; i < nv; i++) {
         float x = vArr[i*3];
@@ -82,6 +86,10 @@ int Mesh::NumVertices() {
 
 int Mesh::NumTriangles() {
     return this->nt;
+}
+
+Material Mesh::MaterialProperties() {
+    return this->material;
 }
 
 bool Mesh::IsBounding() {
@@ -215,6 +223,11 @@ void Mesh::UpdateBoundingVolume() {
 Mesh Mesh::Load(string model_name, bool is_bounding) {
     vector<float> vArr;
     vector<int> tArr;
+    Material material;
+    material.ambient = Vector(0.3, 0.0, 0.0);
+    material.diffuse = Vector(0.5, 0.0, 0.0);
+    material.specular = Vector(1.0, 1.0, 1.0);
+    material.shininess = 1.0;
     int nt = 0, nv = 0, r;
     char line_header[128];
     
@@ -243,6 +256,20 @@ Mesh Mesh::Load(string model_name, bool is_bounding) {
             tArr.push_back(v2-1);
             tArr.push_back(v3-1);
             nt++;
+        } else if (strcmp(line_header, "Ka") == 0) {
+            Vector v;
+            fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+            material.ambient = v;
+        } else if (strcmp(line_header, "Kd") == 0) {
+            Vector v;
+            fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+            material.diffuse = v;
+        } else if (strcmp(line_header, "Ks") == 0) {
+            Vector v;
+            fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+            material.specular = v;
+        } else if (strcmp(line_header, "Ns") == 0) {
+            fscanf(file, "%f\n", &material.shininess);
         } else {
             // ignore for now
         }
@@ -250,7 +277,7 @@ Mesh Mesh::Load(string model_name, bool is_bounding) {
     
     fclose(file);
     
-    return Mesh(nv, nt, &vArr[0], &tArr[0], is_bounding);
+    return Mesh(nv, nt, &vArr[0], &tArr[0], material, is_bounding);
 }
 
 float d(Vector a, Vector b) {
@@ -293,7 +320,7 @@ void Mesh::ComputeBoundingSphere() {
     Mesh tmp = Mesh::Load("models/sphere.obj", true);
     this->bounding_sphere.radius = rad;
     this->bounding_sphere.center = center;
-    this->bounding_volume = new Mesh(tmp.vertices, tmp.vnorms, tmp.triangles, true);
+    this->bounding_volume = new Mesh(tmp.vertices, tmp.vnorms, tmp.triangles, tmp.material, true);
     this->bounding_volume->translation = Vector(center.x, center.y, center.z);
     this->bounding_volume->scale = Vector(rad, rad, rad);
     this->bounding_sphere.original_center = center;

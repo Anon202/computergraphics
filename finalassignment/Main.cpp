@@ -17,7 +17,7 @@ public:
 	Scene(void) {
 		 
 	}
-	void add(Sphere & s) {
+	void add(Sphere s) {
 		spheres.push_back(s); 
 		//cout << "Sphere added: " << "r = " << spheres[spheres.size()-1].r << endl;
 	}
@@ -29,7 +29,7 @@ public:
 };
 
 
-void glSetPixel(int x, int y, Vec3f & c) {
+void glSetPixel(int x, int y, Vec3f c) {
 	glColor3f(c.r, c.g, c.b);
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
@@ -62,7 +62,7 @@ public:
 	}
 
 	void searchClosestHit(const Ray & ray, HitRec & hitRec) {
-		for (int i = 0; i < scene->spheres.size(); i++) {
+		for (unsigned int i = 0; i < scene->spheres.size(); i++) {
 			scene->spheres[i].hit(ray, hitRec);
 		}
 	}
@@ -108,12 +108,12 @@ void display(void) {
 void changeSize(int w, int h) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, w, 0, h);
+	//gluOrtho2D(0, w, 0, h);
 	glViewport(0,0,w,h);
 }
 
-void init(void)
-{
+void init(int argc, char **argv) {
+    glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(640, 480);
 	glutCreateWindow("SimpleRayTracer");
@@ -132,7 +132,7 @@ void init(void)
 
 }
 
-void main(void) {
-	init();
+int main(int argc, char **argv) {
+	init(argc, argv);
 	glutMainLoop();
 }

@@ -50,7 +50,7 @@ template<class T>
 bool Vec3<T>::normalizeIf(void) { 
 	T length = len(); 
 	
-	if (l > 0.0000001) {
+	if (length > 0.0000001) {
 		T invLen = T(1.0) / length;
 		x *= invLen; 
 		y *= invLen; 

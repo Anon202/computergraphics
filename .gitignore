@@ -28,6 +28,7 @@
 *.out
 *.app
 computergraphics
+raytracer
 
 # Others
 other/

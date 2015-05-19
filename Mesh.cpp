@@ -123,9 +123,9 @@ void Mesh::Move(Vector v) {
 }
 
 void Mesh::Rotate(Vector v) {
-    this->Rotate('x', v.x);
-    this->Rotate('y', v.y);
-    this->Rotate('z', v.z);
+    this->Rotate('i', v.x);
+    this->Rotate('j', v.y);
+    this->Rotate('k', v.z);
 }
 
 void Mesh::Scale(Vector v) {

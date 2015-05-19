@@ -181,19 +181,20 @@ void Mesh::Rotate(char dir, float units) {
 }
 
 void Mesh::Scale(char dir, float units) {
-    float f = units;
+    float f = -units;
     if (dir < 'A' || dir > 'Z') {
-        f = -units;
+        f = units;
     }
+    cout << this->scale << endl;
     switch (dir) {
         case 'x': case 'X':
-            this->scale.x += f*0.02;
+            this->scale.x += f;
             break;
         case 'y': case 'Y':
-            this->scale.y += f*0.02;
+            this->scale.y += f;
             break;
         case 'z': case 'Z':
-            this->scale.z += f*0.02;
+            this->scale.z += f;
             break;
         default:
             // TODO: throw exception
@@ -204,7 +205,7 @@ void Mesh::Scale(char dir, float units) {
 
 void Mesh::UniformScale(bool enlarge) {
     int f = (enlarge)? 1 : -1;
-    this->scale = this->scale + Vector(f*0.02, f*0.02, f*0.02);
+    this->scale = this->scale + Vector(f, f, f);
     this->UpdateBoundingVolume();
 }
 

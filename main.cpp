@@ -23,7 +23,13 @@ int selected_obj = 0;
 bool moving_cam = true;
 bool use_parallel_proj = false;
 bool frustum_culling = false;
-string shader = "phong";
+string shaders[4] = {
+    "cartoon",
+    "gouraud",
+    "phong",
+    "example"
+};
+int curr_shader = 0;
 
 vector<Mesh*> meshList;  // Pointer to linked list of triangle meshes
 Camera cam = Camera(1, 10000, 60, Vector(0, 0, 10)); // Setup the camera parameters
@@ -76,14 +82,12 @@ void checkSuccessfulCompilation(GLuint shader) {
         cout << endl;
         //glDeleteShader(shader); // Don't leak the shader.
         return;
-    } else {
-        cout << "Shader compiled successfully..." << endl;
     }
 }
 
 void prepareShaderProgram() {
 	shprg = glCreateProgram();
-	const char* fsfile = ("shaders/" + shader + "fs.glsl").c_str();
+	const char* fsfile = ("shaders/" + shaders[curr_shader] + "fs.glsl").c_str();
     string fs_str = readShaderFile(fsfile);
     const char* fs_src = fs_str.c_str();
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -91,7 +95,7 @@ void prepareShaderProgram() {
 	glCompileShader(fs);
     checkSuccessfulCompilation(fs);
 
-	const char* vsfile = ("shaders/" + shader + "vs.glsl").c_str();
+	const char* vsfile = ("shaders/" + shaders[curr_shader] + "vs.glsl").c_str();
     string vs_str = readShaderFile(vsfile);
     const char* vs_src = vs_str.c_str();
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
@@ -171,7 +175,7 @@ void renderMesh(Mesh* mesh) {
 }
 
 void display(void) {
-    clock_t start = clock();
+    //clock_t start = clock();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		
@@ -196,7 +200,7 @@ void display(void) {
 
 	glUseProgram(shprg);
     if (frustum_culling) {
-        bool nothing_to_render = true;
+        //bool nothing_to_render = true;
         for (unsigned int i = 0; i < meshList.size(); i++) {
             Matrix PVW = PV * meshList[i]->TransformationMatrix();
             Vector center = PVW * meshList[i]->BoundingSphereCenter();
@@ -211,16 +215,16 @@ void display(void) {
                 }
             }
             if (draw) {
-                cout << "Rendering object #" << i << endl;
+                //cout << "Rendering object #" << i << endl;
                 renderMesh(meshList[i]);
                 renderMesh(meshList[i]->bounding_volume);
-                nothing_to_render = false;
+                //nothing_to_render = false;
             }
         }
 
-        if (nothing_to_render) {
-            cout << "Nothing to render" << endl;
-        }
+        //if (nothing_to_render) {
+        //    cout << "Nothing to render" << endl;
+        //}
     } else {
         for (unsigned int i = 0; i < meshList.size(); i++) {
             renderMesh(meshList[i]);
@@ -229,7 +233,7 @@ void display(void) {
 
 	glFlush();
     
-    cout << "Rendering time: " << (std::clock() - start)/(double)(CLOCKS_PER_SEC/1000) << " ms" << endl;
+    //cout << "Rendering time: " << (std::clock() - start)/(double)(CLOCKS_PER_SEC/1000) << " ms" << endl;
 }
 
 void changeSize(int w, int h) {
@@ -248,6 +252,10 @@ void keypress(unsigned char key, int x, int y) {
         return;
     }
     switch(key) {
+    case 'm':  case 'M':
+        curr_shader = (curr_shader + 1)%(sizeof(shaders)/sizeof(shaders[0]));
+	    prepareShaderProgram(); 
+        break;
     case 'o': case 'O':
         frustum_culling = !frustum_culling;
         break;
@@ -257,8 +265,8 @@ void keypress(unsigned char key, int x, int y) {
     case 'c': case 'C':
         moving_cam = true;
         break;
-	case 'z': case 'Z':
-	case 'y': case 'Y':
+	  case 'z': case 'Z':
+  	case 'y': case 'Y':
     case 'x': case 'X':
         if (moving_cam) cam.Move(key);
         else meshList[selected_obj]->Move(key);

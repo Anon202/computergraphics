@@ -357,13 +357,44 @@ int main(int argc, char **argv) {
 
 	// Insert the 3D models you want in your scene here in a vector of meshes
     Mesh::BoundingType(Mesh::SPHERE_BOUNDING);
+    Mesh bunny = Mesh::Load("models/bunny.obj", false);
+    bunny.Scale(Vector(10, 10, 10));
+    bunny.Move(Vector(5, -5, 10));
+    
     Mesh tr = Mesh::Load("models/triceratops.obj", false);
+    tr.Scale(Vector(0.3, 0.3, 0.3));
+    tr.Move(Vector(-10, 15, -10));
+	
+    Mesh knot = Mesh::Load("models/knot.obj", false);
+    knot.Move(Vector(-5, -100, -400));
+
     Mesh cow = Mesh::Load("models/cow.obj", false);
-    tr.Scale(Vector(0.5, 0.5, 0.5));
-    cow.Scale(Vector(20, 20, 20));
-    cow.Move(Vector(-10, 10, 2));
+    cow.Scale(Vector(3, 3, 3));
+    cow.Move(Vector(20, 10, 10));
+
+    Mesh tp = Mesh::Load("models/teapot.obj", false);
+    tp.Move(Vector(30, -20, -15));
+    tp.Rotate(Vector(50, 0, 100));
+   
+    Mesh frog = Mesh::Load("models/frog.obj", false);
+    frog.Rotate(Vector(0, 25, 25));
+    frog.Move(Vector(-80,-30,-100));
+
+    Mesh cube = Mesh::Load("models/cube.obj", false);
+    cube.Rotate(Vector(0, 25, 0));
+    cube.Move(Vector(-10, -23, 0));
+
+    Mesh sphere = Mesh::Load("models/sphere.obj", false);
+    sphere.Move(Vector(10, -23, 0));
+
+    meshList.push_back(&bunny);
 	meshList.push_back(&tr);
-	meshList.push_back(&cow);
+    meshList.push_back(&knot);
+    meshList.push_back(&cow);
+    meshList.push_back(&tp);
+    meshList.push_back(&frog);
+    meshList.push_back(&cube);
+    meshList.push_back(&sphere);
 
     vector<Mesh> benchmark_meshes;
     if (argc == 2 && strcmp("--benchmark", argv[1]) == 0) { 

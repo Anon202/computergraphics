@@ -35,7 +35,7 @@ LightData[2] lights = {
 void main(void) {
     gl_Position = PVM * vec4(vPos, 1.0);
 
-    vec3 n = vec3(PVM * vec4(vNorm, 0.0));
+    vec3 n = normalize(vec3(PVM * vec4(vNorm, 0.0)));
     vec4 v4 = PVM * vec4(vPos, 1.0);
     vec3 vposition = vec3(v4) / v4.w;
     vec3 acc_color = vec3(0, 0, 0);
@@ -46,8 +46,7 @@ void main(void) {
         vec3 r = reflect(-l, n); 
         vec3 ambient = mAmbient * lights[i].ambient;
         vec3 diffuse = mDiffuse * lights[i].diffuse * max(dot(n, l), 0.0);
-        vec3 specular = mSpecular * lights[i].specular * 
-                    pow(max(dot(r, v), 0.0), mShininess);
+        vec3 specular = mSpecular * lights[i].specular * pow(max(dot(r, v), 0.0), mShininess);
         acc_color += ambient + diffuse + specular;
     }
     color = vec4(acc_color, 1.0);

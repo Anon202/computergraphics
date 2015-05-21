@@ -1,7 +1,7 @@
 CC := g++
 CFLAGS := -O3 -g -Wall -Werror -Wno-unknown-pragmas -std=c++11 -D_USE_MATH_DEFINES #-Wextra
 INCLUDES := -I/usr/include/GL/
-LDFLAGS := -lm -lGL -lGLEW -lglut 
+LDFLAGS := -lm -lGL -lGLEW -lglut -lGLU 
 SRCS := Main.cpp Ray.cpp Sphere.cpp  
 OBJS := $(SRCS:.cpp=.o)
 MAIN := raytracer

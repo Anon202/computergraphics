@@ -2,7 +2,7 @@
 #include<iostream>
 using namespace std;
 
-#include <GL/glut.h>
+#include <glut.h>
 
 #include "Vec3.h"
 #include "Image.h"
@@ -17,7 +17,7 @@ public:
 	Scene(void) {
 		 
 	}
-	void add(Sphere s) {
+	void add(const Sphere & s) {
 		spheres.push_back(s); 
 		//cout << "Sphere added: " << "r = " << spheres[spheres.size()-1].r << endl;
 	}
@@ -29,7 +29,7 @@ public:
 };
 
 
-void glSetPixel(int x, int y, Vec3f c) {
+void glSetPixel(int x, int y, const Vec3f & c) {
 	glColor3f(c.r, c.g, c.b);
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
@@ -108,12 +108,12 @@ void display(void) {
 void changeSize(int w, int h) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//gluOrtho2D(0, w, 0, h);
+	gluOrtho2D(0, w, 0, h);
 	glViewport(0,0,w,h);
 }
 
 void init(int argc, char **argv) {
-    glutInit(&argc, argv);
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(640, 480);
 	glutCreateWindow("SimpleRayTracer");
@@ -135,4 +135,5 @@ void init(int argc, char **argv) {
 int main(int argc, char **argv) {
 	init(argc, argv);
 	glutMainLoop();
+    return 0;
 }

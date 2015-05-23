@@ -63,7 +63,7 @@ public:
 
     void searchClosestHit(const Ray & ray, HitRec & hitRec) {
         for (unsigned int i = 0; i < scene->spheres.size(); i++) {
-            scene->spheres[i].hit(ray, hitRec);
+            scene->spheres[i].Hit(ray, hitRec);
         }
     }
 

@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
-#include "Vector.h"
-#include "Matrix.h"
+#include "../algebra/Vector.h"
+#include "../algebra/Matrix.h"
 
 using namespace algebra;
 using namespace std;

@@ -1,6 +1,6 @@
 #include <cmath>
 #include "Camera.h"
-#include "HomVector.h"
+#include "../algebra/HomVector.h"
 
 Camera::Camera(double near, double far, double fov, Vector pos) :
     near_plane(near), far_plane(far), fov(fov) {

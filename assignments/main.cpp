@@ -8,10 +8,10 @@
 #include <cstring>
 #include <fstream>
 
-#include "Matrix.h"
-#include "Vector.h"
-#include "HomVector.h"
-#include "Camera.h"
+#include "../algebra/Matrix.h"
+#include "../algebra/Vector.h"
+#include "../algebra/HomVector.h"
+#include "../common/Camera.h"
 #include "Mesh.h"
 
 using namespace std;

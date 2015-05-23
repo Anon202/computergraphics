@@ -48,8 +48,8 @@ private:
         static float sizeY = 3.0f;
         static float left = -sizeX * 0.5f;
         static float bottom = -sizeY * 0.5f;
-        static float dx =  sizeX / float(image->getWidth());
-        static float dy =  sizeY / float(image->getHeight());
+        static float dx =  sizeX / float(image->GetWidth());
+        static float dy =  sizeY / float(image->GetHeight());
 
         return Vec3f(left + x * dx, bottom + y * dy, z).normalize();
     }
@@ -73,16 +73,16 @@ public:
         //bool hit = false;
         ray.o = Vec3f(0.0f, 0.0f, 0.0f); //Set the start position of the eye rays to the origin
 
-        for (int y = 0; y < image->getHeight(); y++) {
-            for (int x = 0; x < image->getWidth(); x++) {
+        for (int y = 0; y < image->GetHeight(); y++) {
+            for (int x = 0; x < image->GetWidth(); x++) {
                 ray.d = getEyeRayDirection(x, y);
                 hitRec.anyHit = false;
                 searchClosestHit(ray, hitRec);
                 if (hitRec.anyHit) {
-                    image->setPixel(x, y, Vec3f(1.0f, 0.0f, 0.0f));
+                    image->SetPixel(x, y, Vec3f(1.0f, 0.0f, 0.0f));
                     glSetPixel(x, y, Vec3f(1.0f, 0.0f, 0.0f));
                 } else {
-                    image->setPixel(x, y, Vec3f(0.0f, 0.0f, 1.0f));
+                    image->SetPixel(x, y, Vec3f(0.0f, 0.0f, 1.0f));
                     glSetPixel(x, y, Vec3f(0.0f, 0.0f, 1.0f));
                 }
             }

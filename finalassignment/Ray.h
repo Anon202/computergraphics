@@ -3,6 +3,14 @@
 
 #include "Vec3.h"
 
+typedef struct _HitRec {
+	float tHit;
+	int primIndex;
+	Vec3f p;
+	Vec3f n;
+	bool anyHit;
+} HitRec;
+
 class Ray {
 public:
 	Vec3f o, d;
@@ -10,25 +18,12 @@ public:
 	static float rayEps;
 	static float tMax;
 public:
-	Ray() : tClip(tMax) { }	
-	Ray(const Vec3f & o, const Vec3f& d, float tclip = tMax) : o(o), d(d), tClip(tMax) { }
-	
-	void epsMoveStartAlongSurfaceNormal(const Vec3f & n) { o = o + n * rayEps; }
-	void epsMoveStartAlongDir() { o = o + d * rayEps; }
-	
-	static void incRayEps() { rayEps *= 10.0f; }
-	static void decRayEps() { rayEps /= 10.0f; }
+	Ray();	
+	Ray(const Vec3f& o, const Vec3f& d, float tclip = tMax);
+	void EpsMoveStartAlongSurfaceNormal(const Vec3f& n);
+	void EpsMoveStartAlongDir();
+	static void IncRayEps();
+	static void DecRayEps();
 };
-
-
-class HitRec {
-public:	
-	float tHit;
-	int primIndex;
-	Vec3f p;
-	Vec3f n;
-	bool anyHit;
-};
-
 
 #endif

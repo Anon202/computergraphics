@@ -1,4 +1,3 @@
-#include<vector>
 #include<iostream>
 using namespace std;
 
@@ -8,26 +7,7 @@ using namespace std;
 #include "Image.h"
 #include "Ray.h"
 #include "Sphere.h"
-
-
-class Scene {
-public:
-    vector<Sphere> spheres;
-
-    Scene(void) {
-
-    }
-    void add(const Sphere & s) {
-        spheres.push_back(s);
-        //cout << "Sphere added: " << "r = " << spheres[spheres.size()-1].r << endl;
-    }
-
-    void load(char * fileName) {
-        // load a file with spheres for your scene here ...
-    }
-
-};
-
+#include "Scene.h"
 
 void glSetPixel(int x, int y, const Vec3f & c) {
     glColor3f(c.r, c.g, c.b);
@@ -123,10 +103,10 @@ void init(int argc, char **argv) {
 
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
-    Scene * scene = new Scene;
-    scene->add(Sphere(Vec3f(0.0f, 0.0f, -10.0f), 3.0f));
+    Scene* scene = new Scene;
+    scene->Add(Sphere(Vec3f(0.0f, 0.0f, -10.0f), 3.0f));
 
-    Image * image = new Image(640, 480);
+    Image *image = new Image(640, 480);
 
     rayTracer = new SimpleRayTracer(scene, image);
 

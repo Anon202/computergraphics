@@ -16,6 +16,7 @@ public:
     void SetPixel(const int x, const int y, const Vec3f &c);
     Vec3f GetPixel(const int x, const int y);
     Vec3f *GetPixelBufferPtr(void);
+    void Save(void);
 };
 
 #endif

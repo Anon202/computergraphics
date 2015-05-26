@@ -1,13 +1,13 @@
-#include<iostream>
-using namespace std;
-
+#include <iostream>
+#include <cstdlib>
 #include <glut.h>
-
 #include "Vec3.h"
 #include "Image.h"
 #include "Sphere.h"
 #include "Scene.h"
 #include "SimpleRayTracer.h"
+
+using namespace std;
 
 void glSetPixel(int x, int y, const Vec3f & c) {
     glColor3f(c.r, c.g, c.b);
@@ -36,6 +36,16 @@ void changeSize(int w, int h) {
     glViewport(0,0,w,h);
 }
 
+void keypress(unsigned char key, int x, int y) {
+    switch (key) {
+        case 's': case 'S':
+            rayTracer->GetImage()->Save();
+            break;
+        case 'q': case 'Q':
+            exit(0);
+    }
+}
+
 void init(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
@@ -43,12 +53,14 @@ void init(int argc, char **argv) {
     glutCreateWindow("SimpleRayTracer");
     glutDisplayFunc(display);
     glutReshapeFunc(changeSize);
-    //glutKeyboardFunc(keypress);
+    glutKeyboardFunc(keypress);
 
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    scene->Add(Sphere(Vec3f(0.0f, 0.0f, -10.0f), 3.0f));
+    scene->Add(Sphere(Vec3f(-0.5f, 0.0f, -5.0f), 0.5f, Color{1,0,0}));
+    scene->Add(Sphere(Vec3f(0.0f, 0.5f, -6.0f), 0.5f, Color{0,1,0}));
+    scene->Add(Sphere(Vec3f(0.4f, 0.0f, -7.0f), 0.5f, Color{0,0,1}));
 
     Image *image = new Image(640, 480);
 

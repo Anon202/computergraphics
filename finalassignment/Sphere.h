@@ -8,10 +8,11 @@ class Sphere {
 public:
     Vec3f c;
     float r;
-    Vec3f color;
-public:
-    Sphere(const Vec3f & cen, float rad, const Color& color);
 
+public:
+    Vec3f ambient, diffuse, specular;
+    float shininess;
+    Sphere(const Vec3f & cen, float rad);
     bool Hit(const Ray & r, HitRec & rec) const;
     void ComputeSurfaceHitFields(const Ray & r, HitRec & rec) const;
 

@@ -1,6 +1,7 @@
 #include "SimpleRayTracer.h"
 #include <limits>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -21,6 +22,26 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
+Color SimpleRayTracer::Lightning(const HitRec& hitRec) {
+    Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
+    Light light = Light{
+        .position = Vec3f(1, 1, 1),
+        .ambient = Vec3f(1, 1, 1),
+        .diffuse = Vec3f(1, 0, 0),
+        .specular = Vec3f(1, 1, 1)
+    };
+
+    Vec3f v = (-hitRec.p).normalize();
+    Vec3f n = (hitRec.n * 1).normalize();
+    Vec3f l = (light.position - hitRec.p).normalize();
+    Vec3f r =  (-l - n*2.0*n.dot(-l)).normalize(); // reflect(-l, n)
+    Color ambient = sphere.ambient.multCoordwise(light.ambient);
+    Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
+    Color specular = sphere.specular.multCoordwise(light.specular) *
+                     pow(max(r.dot(v), 0.0f), sphere.shininess);
+    return ambient + diffuse + specular;
+}
+
 HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
     float maxZ = -std::numeric_limits<float>::max();
     HitRec closestHit;
@@ -29,6 +50,7 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
     for (unsigned int i = 0; i < this->scene->spheres.size(); i++) {
         this->tests_done++;
         if (this->scene->spheres[i].Hit(ray, hitRec) && this->scene->spheres[i].c.z > maxZ) {
+            this->scene->spheres[i].ComputeSurfaceHitFields(ray, hitRec);
             closestHit = hitRec;
             maxZ = this->scene->spheres[i].c.z;
             closestHit.primIndex = i;
@@ -37,10 +59,10 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
     return closestHit;
 }
 
-Color SimpleRayTracer::CastRay(int x, int y, const Ray& ray) {
+Color SimpleRayTracer::CastRay(const Ray& ray) {
     HitRec hitRec = SearchClosestHit(ray);
     if (hitRec.anyHit) {
-        return this->scene->spheres[hitRec.primIndex].color; 
+        return Lightning(hitRec); 
     } else {
         return Color(0,0,0);
     }
@@ -54,7 +76,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
             ray.d = this->GetEyeRayDirection(x, y);
-            Color color = this->CastRay(x, y, ray);
+            Color color = this->CastRay(ray);
             this->image->SetPixel(x, y, color);
             glSetPixel(x, y, color);
         }

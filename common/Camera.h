@@ -1,3 +1,6 @@
+#ifndef _CAMERA_H
+#define _CAMERA_H
+
 #include "../algebra/Vector.h"
 #include "../algebra/Matrix.h"
 
@@ -20,3 +23,5 @@ class Camera {
         void Rotate(char dir);
         Matrix LookAt();
 };
+
+#endif

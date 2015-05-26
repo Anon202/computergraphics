@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := -O3 -g -Wall -Werror -std=c++11 -D_USE_MATH_DEFINES #-Wextra
+CFLAGS := -O3 -g -Wall -Werror -std=c++11 -D_USE_MATH_DEFINES -Wextra
 INCLUDES := -I/usr/include/GL/
 LDFLAGS := -lm -lGL -lGLEW -lglut -lGLU -lbmp 
 SRCS := Main.cpp Ray.cpp Sphere.cpp Image.cpp Scene.cpp SimpleRayTracer.cpp Camera.cpp 

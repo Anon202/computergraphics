@@ -76,19 +76,19 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     
     Scene* scene = new Scene;
-    scene->Add(Sphere(Vec3f(0.0f, 0.5f, -4.0f), 0.5f));
+    scene->Add(Sphere(Vec3f(-1.0f, 0.5f, -6.0f), 0.5f));
     scene->spheres[0].ambient = Vec3f(0, 0, 0.5);
     scene->spheres[0].diffuse = Vec3f(0.6, 0.4, 1.0);
     scene->spheres[0].specular = Vec3f(1.0, 1.0, 1.0);
     scene->spheres[0].shininess = 5;
 
-    scene->Add(Sphere(Vec3f(-1.0f, 0.0f, -5.0f), 0.5f));
+    scene->Add(Sphere(Vec3f(0.0f, 0.0f, -5.0f), 0.5f));
     scene->spheres[1].ambient = Vec3f(0.5, 0, 0);
     scene->spheres[1].diffuse = Vec3f(0.5, 0, 0);
     scene->spheres[1].specular = Vec3f(1, 1, 1);
     scene->spheres[1].shininess = 5;
     
-    scene->Add(Sphere(Vec3f(1.0f, 0.0f, -6.0f), 0.5f));
+    scene->Add(Sphere(Vec3f(1.0f, 0.0f, -4.0f), 0.5f));
     scene->spheres[2].ambient = Vec3f(0, 0.5, 0);
     scene->spheres[2].diffuse = Vec3f(0, 0.5, 0);
     scene->spheres[2].specular = Vec3f(1.0, 1.0, 1.0);

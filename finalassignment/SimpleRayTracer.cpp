@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cmath>
 
+#define MAX_DEPTH 3
+
 using namespace std;
 
 Vec3f SimpleRayTracer::GetEyeRayDirection(int x, int y) {
@@ -22,7 +24,7 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
-Color SimpleRayTracer::Lightning(const Ray& ray, const HitRec& hitRec) {
+Color SimpleRayTracer::Lightning(const HitRec& hitRec, int depth) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
     Light light = Light{
         .position = Vec3f(-5, -3, 1),
@@ -39,7 +41,11 @@ Color SimpleRayTracer::Lightning(const Ray& ray, const HitRec& hitRec) {
     Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
     Color specular = sphere.specular.multCoordwise(light.specular) *
                      pow(max(r.dot(v), 0.0f), sphere.shininess);
-    return ambient + diffuse + specular;
+    Ray newRay;
+    newRay.o = hitRec.p;
+    newRay.d = r;
+    Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.dot(v), 0.0f), sphere.shininess);
+    return ambient + diffuse + specular + ref;
 }
 
 HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
@@ -59,10 +65,13 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
     return closestHit;
 }
 
-Color SimpleRayTracer::CastRay(const Ray& ray) {
+Color SimpleRayTracer::CastRay(const Ray& ray, int depth) {
+    if (depth > MAX_DEPTH) {
+        return Color(0,0,0);
+    }
     HitRec hitRec = SearchClosestHit(ray);
     if (hitRec.anyHit) {
-        return Lightning(ray, hitRec); 
+        return Lightning(hitRec, depth); 
     } else {
         return Color(0,0,0);
     }
@@ -76,7 +85,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
             ray.d = this->GetEyeRayDirection(x, y);
-            Color color = this->CastRay(ray);
+            Color color = this->CastRay(ray, 1);
             this->image->SetPixel(x, y, color);
             glSetPixel(x, y, color);
         }

@@ -28,8 +28,8 @@ public:
     void FireRays(void (*glSetPixel)(int, int, const Vec3f&));
     Image* GetImage(void);
     int TestsDone(void);
-    Color CastRay(const Ray& ray);
-    Color Lightning(const Ray& ray, const HitRec& hitRec);
+    Color CastRay(const Ray& ray, int depth);
+    Color Lightning(const HitRec& hitRec, int depth);
 };
 
 #endif

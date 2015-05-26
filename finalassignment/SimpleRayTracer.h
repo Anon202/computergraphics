@@ -29,7 +29,7 @@ public:
     Image* GetImage(void);
     int TestsDone(void);
     Color CastRay(const Ray& ray);
-    Color Lightning(const HitRec& hitRec);
+    Color Lightning(const Ray& ray, const HitRec& hitRec);
 };
 
 #endif

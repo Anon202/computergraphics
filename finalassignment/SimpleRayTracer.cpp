@@ -22,19 +22,19 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
-Color SimpleRayTracer::Lightning(const HitRec& hitRec) {
+Color SimpleRayTracer::Lightning(const Ray& ray, const HitRec& hitRec) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
     Light light = Light{
-        .position = Vec3f(1, 1, 1),
-        .ambient = Vec3f(1, 1, 1),
-        .diffuse = Vec3f(1, 0, 0),
+        .position = Vec3f(-5, -3, 1),
+        .ambient = Vec3f(0.4, 0.4, 0.4),
+        .diffuse = Vec3f(0.8, 0.8, 0.8),
         .specular = Vec3f(1, 1, 1)
     };
 
     Vec3f v = (-hitRec.p).normalize();
     Vec3f n = (hitRec.n * 1).normalize();
-    Vec3f l = (light.position - hitRec.p).normalize();
-    Vec3f r =  (-l - n*2.0*n.dot(-l)).normalize(); // reflect(-l, n)
+    Vec3f l = (hitRec.p - light.position).normalize();
+    Vec3f r =  (l - n*2.0*n.dot(l)).normalize(); // reflect(-l, n)
     Color ambient = sphere.ambient.multCoordwise(light.ambient);
     Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
     Color specular = sphere.specular.multCoordwise(light.specular) *
@@ -62,7 +62,7 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
 Color SimpleRayTracer::CastRay(const Ray& ray) {
     HitRec hitRec = SearchClosestHit(ray);
     if (hitRec.anyHit) {
-        return Lightning(hitRec); 
+        return Lightning(ray, hitRec); 
     } else {
         return Color(0,0,0);
     }

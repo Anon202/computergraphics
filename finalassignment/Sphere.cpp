@@ -4,13 +4,13 @@
 
 using namespace std;
 
-Sphere::Sphere(const Vec3f & cen, float rad, Color color) : c(cen), r(rad) {
+Sphere::Sphere(const Vec3f& cen, float rad, const Color& color) : c(cen), r(rad) {
     this->color.r = color.r;
     this->color.g = color.g;
     this->color.b = color.b;
 }
 
-bool Sphere::Hit(const Ray &r, HitRec & rec) const {
+bool Sphere::Hit(const Ray &r, HitRec &rec) const {
     Vec3f v = r.o - this->c;
     float b = 2*v.dot(r.d);
     float c = v.dot(v) - this->r*this->r;

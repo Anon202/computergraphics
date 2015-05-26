@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Image.h"
 #include "Vec3.h"
+#include "Camera.h"
 
 typedef struct _Light {
     Vec3f position;
@@ -19,13 +20,15 @@ private:
     Image* image;
     Vec3f GetEyeRayDirection(int x, int y);
     int tests_done;
+    HitRec SearchClosestHit(const Ray& ray);
 
 public:
+    Camera cam;
     SimpleRayTracer(Scene* scene, Image* image);
-    void SearchClosestHit(const Ray& ray, HitRec& hitRec);
     void FireRays(void (*glSetPixel)(int, int, const Vec3f&));
     Image* GetImage(void);
     int TestsDone(void);
+    Color CastRay(int x, int y, const Ray& ray);
 };
 
 #endif

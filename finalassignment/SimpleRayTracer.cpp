@@ -21,40 +21,42 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
-void SimpleRayTracer::SearchClosestHit(const Ray& ray, HitRec& hitRec) {
+HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
     float maxZ = -std::numeric_limits<float>::max();
     HitRec closestHit;
+    HitRec hitRec;
     closestHit.anyHit = false;
     for (unsigned int i = 0; i < this->scene->spheres.size(); i++) {
         this->tests_done++;
         if (this->scene->spheres[i].Hit(ray, hitRec) && this->scene->spheres[i].c.z > maxZ) {
             closestHit = hitRec;
-            closestHit.color = this->scene->spheres[i].color;
             maxZ = this->scene->spheres[i].c.z;
+            closestHit.primIndex = i;
         }
     }
-    hitRec = closestHit;
+    return closestHit;
+}
+
+Color SimpleRayTracer::CastRay(int x, int y, const Ray& ray) {
+    HitRec hitRec = SearchClosestHit(ray);
+    if (hitRec.anyHit) {
+        return this->scene->spheres[hitRec.primIndex].color; 
+    } else {
+        return Color(0,0,0);
+    }
 }
 
 void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
     this->tests_done = 0;
     Ray ray;
-    HitRec hitRec;
-    //bool hit = false;
-    ray.o = Vec3f(0.0f, 0.0f, 0.0f); //Set the start position of the eye rays to the origin
+    ray.o = this->cam.position; //Set the start position of the eye rays to the origin 
 
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
             ray.d = this->GetEyeRayDirection(x, y);
-            hitRec.anyHit = false;
-            SearchClosestHit(ray, hitRec);
-            if (hitRec.anyHit) {
-                this->image->SetPixel(x, y, hitRec.color);
-                glSetPixel(x, y, hitRec.color);
-            } else {
-                this->image->SetPixel(x, y, Vec3f(0.0f, 0.0f, 0.0f));
-                glSetPixel(x, y, Vec3f(0.0f, 0.0f, 0.0f));
-            }
+            Color color = this->CastRay(x, y, ray);
+            this->image->SetPixel(x, y, color);
+            glSetPixel(x, y, color);
         }
     }
 }

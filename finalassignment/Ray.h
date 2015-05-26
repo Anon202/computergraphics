@@ -9,7 +9,6 @@ typedef struct _HitRec {
     Vec3f p;
     Vec3f n;
     bool anyHit;
-    Vec3f color;
 } HitRec;
 
 class Ray {

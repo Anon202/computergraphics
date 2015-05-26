@@ -8,6 +8,7 @@
 #include "Sphere.h"
 #include "Scene.h"
 #include "SimpleRayTracer.h"
+#include "Camera.h"
 
 using namespace std;
 
@@ -42,6 +43,12 @@ void keypress(unsigned char key, int x, int y) {
     clock_t t;
     float ms;
     switch (key) {
+        case 'x': case 'X':
+        case 'y': case 'Y':
+        case 'z': case 'Z':
+            rayTracer->cam.Move(key);
+            display();
+            break;
         case 's': case 'S':
             rayTracer->GetImage()->Save();
             break;
@@ -69,14 +76,14 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    scene->Add(Sphere(Vec3f(-0.5f, 0.0f, -5.0f), 0.5f, Color{1,0,0}));
-    scene->Add(Sphere(Vec3f(0.0f, 0.5f, -6.0f), 0.5f, Color{0,1,0}));
-    scene->Add(Sphere(Vec3f(0.4f, 0.0f, -7.0f), 0.5f, Color{0,0,1}));
+    scene->Add(Sphere(Vec3f(-0.5f, 0.0f, -5.0f), 0.5f, Color(1,0,0)));
+    scene->Add(Sphere(Vec3f(0.0f, 0.5f, -6.0f), 0.5f, Color(0,1,0)));
+    scene->Add(Sphere(Vec3f(0.4f, 0.0f, -7.0f), 0.5f, Color(0,0,1)));
 
     Image *image = new Image(640, 480);
 
     rayTracer = new SimpleRayTracer(scene, image);
-
+    rayTracer->cam = Camera(Vec3f(0,0,0), Vec3f(0,1,0), Vec3f(0,0,0));
 }
 
 int main(int argc, char **argv) {

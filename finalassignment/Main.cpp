@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 #include <glut.h>
+
 #include "Vec3.h"
 #include "Image.h"
 #include "Sphere.h"
@@ -37,9 +39,18 @@ void changeSize(int w, int h) {
 }
 
 void keypress(unsigned char key, int x, int y) {
+    clock_t t;
+    float ms;
     switch (key) {
         case 's': case 'S':
             rayTracer->GetImage()->Save();
+            break;
+        case 'm': case 'M':
+            t = clock();
+            display();
+            ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
+            printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
+                    ms, rayTracer->TestsDone());
             break;
         case 'q': case 'Q':
             exit(0);

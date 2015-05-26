@@ -18,12 +18,14 @@ private:
     Scene* scene;
     Image* image;
     Vec3f GetEyeRayDirection(int x, int y);
+    int tests_done;
 
 public:
     SimpleRayTracer(Scene* scene, Image* image);
     void SearchClosestHit(const Ray& ray, HitRec& hitRec);
     void FireRays(void (*glSetPixel)(int, int, const Vec3f&));
     Image* GetImage(void);
+    int TestsDone(void);
 };
 
 #endif

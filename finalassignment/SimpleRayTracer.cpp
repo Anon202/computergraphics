@@ -26,6 +26,7 @@ void SimpleRayTracer::SearchClosestHit(const Ray& ray, HitRec& hitRec) {
     HitRec closestHit;
     closestHit.anyHit = false;
     for (unsigned int i = 0; i < this->scene->spheres.size(); i++) {
+        this->tests_done++;
         if (this->scene->spheres[i].Hit(ray, hitRec) && this->scene->spheres[i].c.z > maxZ) {
             closestHit = hitRec;
             closestHit.color = this->scene->spheres[i].color;
@@ -36,6 +37,7 @@ void SimpleRayTracer::SearchClosestHit(const Ray& ray, HitRec& hitRec) {
 }
 
 void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
+    this->tests_done = 0;
     Ray ray;
     HitRec hitRec;
     //bool hit = false;
@@ -59,4 +61,8 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
 
 Image* SimpleRayTracer::GetImage(void) {
     return this->image;
+}
+
+int SimpleRayTracer::TestsDone(void) {
+    return this->tests_done;
 }

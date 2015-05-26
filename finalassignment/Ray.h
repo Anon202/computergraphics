@@ -4,11 +4,12 @@
 #include "Vec3.h"
 
 typedef struct _HitRec {
-	float tHit;
-	int primIndex;
-	Vec3f p;
-	Vec3f n;
-	bool anyHit;
+    float tHit;
+    int primIndex;
+    Vec3f p;
+    Vec3f n;
+    bool anyHit;
+    Vec3f color;
 } HitRec;
 
 class Ray {

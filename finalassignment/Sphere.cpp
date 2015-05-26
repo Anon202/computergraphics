@@ -1,7 +1,13 @@
-
 #include "Sphere.h"
+#include <cmath>
+#include <iostream>
 
-Sphere::Sphere(const Vec3f & cen, float rad) : c(cen), r(rad) {
+using namespace std;
+
+Sphere::Sphere(const Vec3f & cen, float rad, Color color) : c(cen), r(rad) {
+    this->color.r = color.r;
+    this->color.g = color.g;
+    this->color.b = color.b;
 }
 
 bool Sphere::Hit(const Ray &r, HitRec & rec) const {
@@ -16,6 +22,12 @@ bool Sphere::Hit(const Ray &r, HitRec & rec) const {
     if (mSq > radSq) {
         return false;
     }
+    float b = 2*s;
+    float c = v.dot(v) - radSq;
+    float d = b*b - 4*c;
+    float t1 = (-b + sqrt(d))/2;
+    float t2 = (-b - sqrt(d))/2;
+    rec.tHit = (t1 > 0)? t1 : t2;
     rec.anyHit = true;
     return true;
 }

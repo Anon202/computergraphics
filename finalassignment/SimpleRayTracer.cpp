@@ -1,4 +1,8 @@
 #include "SimpleRayTracer.h"
+#include <limits>
+#include <iostream>
+
+using namespace std;
 
 Vec3f SimpleRayTracer::GetEyeRayDirection(int x, int y) {
     //Uses a fix camera looking along the negative z-axis
@@ -18,9 +22,17 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
 }
 
 void SimpleRayTracer::SearchClosestHit(const Ray& ray, HitRec& hitRec) {
+    float maxZ = -std::numeric_limits<float>::max();
+    HitRec closestHit;
+    closestHit.anyHit = false;
     for (unsigned int i = 0; i < this->scene->spheres.size(); i++) {
-        this->scene->spheres[i].Hit(ray, hitRec);
+        if (this->scene->spheres[i].Hit(ray, hitRec) && this->scene->spheres[i].c.z > maxZ) {
+            closestHit = hitRec;
+            closestHit.color = this->scene->spheres[i].color;
+            maxZ = this->scene->spheres[i].c.z;
+        }
     }
+    hitRec = closestHit;
 }
 
 void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
@@ -35,12 +47,16 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
             hitRec.anyHit = false;
             SearchClosestHit(ray, hitRec);
             if (hitRec.anyHit) {
-                this->image->SetPixel(x, y, Vec3f(1.0f, 0.0f, 0.0f));
-                glSetPixel(x, y, Vec3f(1.0f, 0.0f, 0.0f));
+                this->image->SetPixel(x, y, hitRec.color);
+                glSetPixel(x, y, hitRec.color);
             } else {
-                this->image->SetPixel(x, y, Vec3f(0.0f, 0.0f, 1.0f));
-                glSetPixel(x, y, Vec3f(0.0f, 0.0f, 1.0f));
+                this->image->SetPixel(x, y, Vec3f(0.0f, 0.0f, 0.0f));
+                glSetPixel(x, y, Vec3f(0.0f, 0.0f, 0.0f));
             }
         }
     }
+}
+
+Image* SimpleRayTracer::GetImage(void) {
+    return this->image;
 }

@@ -11,20 +11,14 @@ Sphere::Sphere(const Vec3f & cen, float rad, Color color) : c(cen), r(rad) {
 }
 
 bool Sphere::Hit(const Ray &r, HitRec & rec) const {
-    Vec3f v = this->c - r.o;
-    float s = v.dot(r.d);
-    float vLenSq = v.dot(v);
-    float radSq = this->r * this->r;
-    if (s < 0 && vLenSq > radSq) {
-        return false;
-    }
-    float mSq = vLenSq - s * s;
-    if (mSq > radSq) {
-        return false;
-    }
-    float b = 2*s;
-    float c = v.dot(v) - radSq;
+    Vec3f v = r.o - this->c;
+    float b = 2*v.dot(r.d);
+    float c = v.dot(v) - this->r*this->r;
     float d = b*b - 4*c;
+    if (d < 0) {
+        rec.anyHit = false;
+        return false;
+    }
     float t1 = (-b + sqrt(d))/2;
     float t2 = (-b - sqrt(d))/2;
     rec.tHit = (t1 > 0)? t1 : t2;

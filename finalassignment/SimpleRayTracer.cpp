@@ -2,6 +2,7 @@
 #include <limits>
 #include <iostream>
 #include <cmath>
+#include <ctime>
 
 #define MAX_DEPTH 3
 
@@ -91,23 +92,30 @@ Color SimpleRayTracer::CastRay(const Ray& ray, int depth) {
 
 void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
     this->tests_done = 0;
-    Ray ray;
-    ray.o = this->cam.position; //Set the start position of the eye rays to the origin 
+    clock_t t = clock();
 
+    #pragma omp parallel for
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
+            Ray ray;
+            ray.o = this->cam.position;
             ray.d = this->GetEyeRayDirection(x, y);
             Color color = this->CastRay(ray, 1);
             this->image->SetPixel(x, y, color);
-            glSetPixel(x, y, color);
+        }
+    }
+    
+    float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
+    printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
+            ms, this->tests_done);
+    
+    for (int y = 0; y < this->image->GetHeight(); y++) {
+        for (int x = 0; x < this->image->GetWidth(); x++) {
+            glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
 }
 
 Image* SimpleRayTracer::GetImage(void) {
     return this->image;
-}
-
-int SimpleRayTracer::TestsDone(void) {
-    return this->tests_done;
 }

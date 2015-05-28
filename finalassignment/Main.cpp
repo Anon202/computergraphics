@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
-#include <ctime>
 #include <glut.h>
+#include <omp.h>
 
 #include "Vec3.h"
 #include "Image.h"
@@ -20,10 +20,11 @@ void glSetPixel(int x, int y, const Vec3f & c) {
 }
 
 SimpleRayTracer *rayTracer;
+bool benchmark = false;
 void shadowsCase(Scene* scene);
 void testCase1(Scene* scene);
 
-void display(void) {
+void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
@@ -42,8 +43,6 @@ void changeSize(int w, int h) {
 }
 
 void keypress(unsigned char key, int x, int y) {
-    clock_t t;
-    float ms;
     switch (key) {
         case 'x': case 'X':
         case 'y': case 'Y':
@@ -55,11 +54,9 @@ void keypress(unsigned char key, int x, int y) {
             rayTracer->GetImage()->Save();
             break;
         case 'm': case 'M':
-            t = clock();
+            benchmark = true;
             display();
-            ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
-            printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
-                    ms, rayTracer->TestsDone());
+            benchmark = false;
             break;
         case 'q': case 'Q':
             exit(0);
@@ -141,6 +138,7 @@ void shadowsCase(Scene* scene) {
 }
 
 int main(int argc, char **argv) {
+    cout << "There are " << omp_get_num_procs() << " procs." << endl;
     init(argc, argv);
     glutMainLoop();
     return 0;

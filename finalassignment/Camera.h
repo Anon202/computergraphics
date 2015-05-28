@@ -1,16 +1,18 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
-#include "Vec3.h"
+#include "../algebra/Vector.h"
+
+using namespace algebra;
 
 class Camera {
 public:
-    Vec3f position;
-    Vec3f up;
-    Vec3f lookAt;
-    Vec3f w, u, v;
+    Vector position;
+    Vector up;
+    Vector lookAt;
+    Vector w, u, v;
     Camera();
-    Camera(Vec3f pos, Vec3f u, Vec3f look);
+    Camera(Vector pos, Vector u, Vector look);
     void CalculateWUV();
     void Move(char dir);
 };

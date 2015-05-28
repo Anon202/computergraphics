@@ -7,8 +7,9 @@
 #define MAX_DEPTH 3
 
 using namespace std;
+using namespace algebra;
 
-Vec3f SimpleRayTracer::GetEyeRayDirection(int x, int y) {
+Vector SimpleRayTracer::GetEyeRayDirection(int x, int y) {
     //Uses a fix camera looking along the negative z-axis
     static float z = -5.0f;
     static float sizeX = 4.0f;
@@ -17,7 +18,7 @@ Vec3f SimpleRayTracer::GetEyeRayDirection(int x, int y) {
     static float bottom = -sizeY * 0.5f;
     static float dx =  sizeX / float(image->GetWidth());
     static float dy =  sizeY / float(image->GetHeight());
-    return Vec3f(left + x * dx, bottom + y * dy, z).normalize();
+    return Vector(left + x * dx, bottom + y * dy, z).Normalized();
 }
 
 SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
@@ -25,20 +26,20 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
-Color SimpleRayTracer::Lightning(Vec3f rayOrigin, const HitRec& hitRec, int depth) {
+Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
     Color color = Color(0,0,0);
     for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
         Light light = this->scene->lights[i];
 
-        Vec3f v = (rayOrigin - hitRec.p).normalize();
-        Vec3f n = (hitRec.n * 1).normalize();
-        Vec3f l = (light.position - hitRec.p).normalize();
-        Vec3f r = (n*2.0*n.dot(l) - l).normalize(); // reflect(-l, n)
-        Color ambient = sphere.ambient.multCoordwise(light.ambient);
-        Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
-        Color specular = sphere.specular.multCoordwise(light.specular) *
-                         pow(max(r.dot(v), 0.0f), sphere.shininess);
+        Vector v = (rayOrigin - hitRec.p).Normalized();
+        Vector n = (hitRec.n * 1).Normalized();
+        Vector l = (light.position - hitRec.p).Normalized();
+        Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
+        Color ambient = sphere.ambient.MultCoordwise(light.ambient);
+        Color diffuse = sphere.diffuse.MultCoordwise(light.diffuse) * max(n.Dot(l), 0.0f);
+        Color specular = sphere.specular.MultCoordwise(light.specular) *
+                         pow(max(r.Dot(v), 0.0f), sphere.shininess);
         
         Ray shadowRay;
         shadowRay.o = hitRec.p;
@@ -53,7 +54,7 @@ Color SimpleRayTracer::Lightning(Vec3f rayOrigin, const HitRec& hitRec, int dept
         newRay.o = hitRec.p;
         newRay.d = r;
         newRay.EpsMoveStartAlongSurfaceNormal(n);
-        Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.dot(v), 0.0f), sphere.shininess);
+        Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.Dot(v), 0.0f), sphere.shininess);
         
         color += ambient + diffuse + specular + ref;
     }
@@ -90,11 +91,10 @@ Color SimpleRayTracer::CastRay(const Ray& ray, int depth) {
     }
 }
 
-void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vec3f&)) {
+void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
     this->tests_done = 0;
     clock_t t = clock();
 
-    #pragma omp parallel for
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
             Ray ray;

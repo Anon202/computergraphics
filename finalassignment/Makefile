@@ -2,7 +2,7 @@ CC := g++
 CFLAGS := -O3 -g -Wall -Werror -std=c++11 -D_USE_MATH_DEFINES -fopenmp
 INCLUDES := -I/usr/include/GL/
 LDFLAGS := -lm -lGL -lGLEW -lglut -lGLU -lbmp 
-SRCS := Main.cpp Ray.cpp Sphere.cpp Image.cpp Scene.cpp SimpleRayTracer.cpp Camera.cpp 
+SRCS := Main.cpp Ray.cpp Sphere.cpp Image.cpp Scene.cpp SimpleRayTracer.cpp Camera.cpp ../algebra/Vector.cpp 
 OBJS := $(SRCS:.cpp=.o)
 MAIN := raytracer
 
@@ -16,4 +16,4 @@ $(MAIN): $(OBJS)
 
 .PHONY: clean
 clean:
-	rm -f *.o *~ $(MAIN)
+	rm -f *.o *~ $(MAIN) ../algebra/*.o

@@ -1,18 +1,20 @@
 #ifndef _SPHERE_H_
 #define _SPHERE_H_
 
-#include "Vec3.h"
+#include "../algebra/Vector.h"
 #include "Ray.h"
+
+using namespace algebra;
 
 class Sphere {
 public:
-    Vec3f c;
+    Vector c;
     float r;
 
 public:
-    Vec3f ambient, diffuse, specular;
+    Vector ambient, diffuse, specular;
     float shininess;
-    Sphere(const Vec3f & cen, float rad);
+    Sphere(const Vector & cen, float rad);
     bool Hit(const Ray & r, HitRec & rec) const;
 };
 

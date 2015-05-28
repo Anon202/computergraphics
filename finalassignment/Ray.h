@@ -1,26 +1,28 @@
 #ifndef _RAY_H_
 #define _RAY_H_
 
-#include "Vec3.h"
+#include "../algebra/Vector.h"
+
+using namespace algebra;
 
 typedef struct _HitRec {
     float tHit;
     int primIndex;
-    Vec3f p;
-    Vec3f n;
+    Vector p;
+    Vector n;
     bool anyHit;
 } HitRec;
 
 class Ray {
 public:
-	Vec3f o, d;
+	Vector o, d;
 	float tClip;	
 	static float rayEps;
 	static float tMax;
 public:
 	Ray();	
-	Ray(const Vec3f& o, const Vec3f& d, float tclip = tMax);
-	void EpsMoveStartAlongSurfaceNormal(const Vec3f& n);
+	Ray(const Vector& o, const Vector& d, float tclip = tMax);
+	void EpsMoveStartAlongSurfaceNormal(const Vector& n);
 	void EpsMoveStartAlongDir();
 	static void IncRayEps();
 	static void DecRayEps();

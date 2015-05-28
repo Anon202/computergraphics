@@ -6,7 +6,7 @@
 using namespace std;
 
 Image::Image(const int w, const int h) : width(w), height(h) {
-    this->pixels = new Vec3f[this->width * this->height];
+    this->pixels = new Vector[this->width * this->height];
 }
 
 Image::~Image(void) {
@@ -21,15 +21,15 @@ int Image::GetHeight(void) const {
     return this->height;
 }
 
-void Image::SetPixel(const int x, const int y, const Vec3f &c) {
+void Image::SetPixel(const int x, const int y, const Vector &c) {
     this->pixels[y * this->width + x] = c;
 }
 
-Vec3f Image::GetPixel(const int x, const int y) {
+Vector Image::GetPixel(const int x, const int y) {
     return this->pixels[y * this->width + x];
 }
 
-Vec3f *Image::GetPixelBufferPtr(void) {
+Vector *Image::GetPixelBufferPtr(void) {
     return this->pixels;
 }
 
@@ -41,7 +41,7 @@ void Image::Save(void) {
     }
     for (int i = 0; i < this->GetWidth(); i++) {
         for (int j = 0; j < this->GetHeight(); j++) {
-            Vec3f p = this->GetPixel(i, j);
+            Vector p = this->GetPixel(i, j);
             rgb_pixel_t pixel = {(uint8_t)(p.b*255), (uint8_t)(p.g*255), (uint8_t)(p.r*255), 0};
             bmp_set_pixel(bmp, i, this->GetHeight() - j, pixel);
         }

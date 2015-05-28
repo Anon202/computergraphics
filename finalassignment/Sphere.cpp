@@ -3,15 +3,16 @@
 #include <iostream>
 
 using namespace std;
+using namespace algebra;
 
-Sphere::Sphere(const Vec3f& cen, float rad) : c(cen), r(rad) {
+Sphere::Sphere(const Vector& cen, float rad) : c(cen), r(rad) {
 }
 
 bool Sphere::Hit(const Ray &r, HitRec &rec) const {
-    Vec3f v = r.o - this->c;
-    float a = r.d.dot(r.d);
-    float b = 2*v.dot(r.d);
-    float c = v.dot(v) - this->r*this->r;
+    Vector v = r.o - this->c;
+    float a = r.d.Dot(r.d);
+    float b = 2*v.Dot(r.d);
+    float c = v.Dot(v) - this->r*this->r;
     float d = b*b - 4*a*c;
     if (d < 0) {
         rec.anyHit = false;
@@ -29,6 +30,6 @@ bool Sphere::Hit(const Ray &r, HitRec &rec) const {
     }
     rec.anyHit = true;
     rec.p = r.o + r.d * rec.tHit;
-    rec.n = (rec.p - this->c).normalize();
+    rec.n = (rec.p - this->c).Normalized();
     return true;
 }

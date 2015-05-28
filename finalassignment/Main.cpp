@@ -3,7 +3,7 @@
 #include <glut.h>
 #include <omp.h>
 
-#include "Vec3.h"
+#include "../algebra/Vector.h"
 #include "Image.h"
 #include "Sphere.h"
 #include "Scene.h"
@@ -11,8 +11,9 @@
 #include "Camera.h"
 
 using namespace std;
+using namespace algebra;
 
-void glSetPixel(int x, int y, const Vec3f & c) {
+void glSetPixel(int x, int y, const Vector & c) {
     glColor3f(c.r, c.g, c.b);
     glBegin(GL_POINTS);
     glVertex2i(x, y);
@@ -80,60 +81,60 @@ void init(int argc, char **argv) {
     Image *image = new Image(640, 480);
 
     rayTracer = new SimpleRayTracer(scene, image);
-    rayTracer->cam = Camera(Vec3f(0,0,10), Vec3f(0,1,0), Vec3f(0,0,0));
+    rayTracer->cam = Camera(Vector(0,0,10), Vector(0,1,0), Vector(0,0,0));
 }
 
 void testCase1(Scene* scene) { 
-    scene->Add(Sphere(Vec3f(-1.0f, 0.5f, -6.0f), 0.5f));
-    scene->spheres[0].ambient = Vec3f(0, 0, 0.5);
-    scene->spheres[0].diffuse = Vec3f(0.6, 0.4, 1.0);
-    scene->spheres[0].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->Add(Sphere(Vector(-1.0f, 0.5f, -6.0f), 0.5f));
+    scene->spheres[0].ambient = Vector(0, 0, 0.5);
+    scene->spheres[0].diffuse = Vector(0.6, 0.4, 1.0);
+    scene->spheres[0].specular = Vector(1.0, 1.0, 1.0);
     scene->spheres[0].shininess = 5;
 
-    scene->Add(Sphere(Vec3f(0.0f, 0.0f, -5.0f), 0.5f));
-    scene->spheres[1].ambient = Vec3f(0.5, 0, 0);
-    scene->spheres[1].diffuse = Vec3f(0.5, 0, 0);
-    scene->spheres[1].specular = Vec3f(1, 1, 1);
+    scene->Add(Sphere(Vector(0.0f, 0.0f, -5.0f), 0.5f));
+    scene->spheres[1].ambient = Vector(0.5, 0, 0);
+    scene->spheres[1].diffuse = Vector(0.5, 0, 0);
+    scene->spheres[1].specular = Vector(1, 1, 1);
     scene->spheres[1].shininess = 5;
     
-    scene->Add(Sphere(Vec3f(0.5f, 0.0f, -4.0f), 0.5f));
-    scene->spheres[2].ambient = Vec3f(0, 0.5, 0);
-    scene->spheres[2].diffuse = Vec3f(0, 0.5, 0);
-    scene->spheres[2].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->Add(Sphere(Vector(0.5f, 0.0f, -4.0f), 0.5f));
+    scene->spheres[2].ambient = Vector(0, 0.5, 0);
+    scene->spheres[2].diffuse = Vector(0, 0.5, 0);
+    scene->spheres[2].specular = Vector(1.0, 1.0, 1.0);
     scene->spheres[2].shininess = 5;
     
-    scene->Add(Sphere(Vec3f(1.0f, 0.0f, -10.0f), 3.0f));
-    scene->spheres[3].ambient = Vec3f(0.8, 0.8, 0);
-    scene->spheres[3].diffuse = Vec3f(0.3, 0.3, 0);
-    scene->spheres[3].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->Add(Sphere(Vector(1.0f, 0.0f, -10.0f), 3.0f));
+    scene->spheres[3].ambient = Vector(0.8, 0.8, 0);
+    scene->spheres[3].diffuse = Vector(0.3, 0.3, 0);
+    scene->spheres[3].specular = Vector(1.0, 1.0, 1.0);
     scene->spheres[3].shininess = 10;
 
     scene->Add(Light{
-        .position = Vec3f(10, 5, -5),
-        .ambient = Vec3f(0.4, 0.4, 0.4),
-        .diffuse = Vec3f(0.8, 0.8, 0.8),
-        .specular = Vec3f(1, 1, 1)
+        .position = Vector(10, 5, -5),
+        .ambient = Vector(0.4, 0.4, 0.4),
+        .diffuse = Vector(0.8, 0.8, 0.8),
+        .specular = Vector(1, 1, 1)
     });
 }
 
 void shadowsCase(Scene* scene) {
-    scene->Add(Sphere(Vec3f(-1.0f, 0.0f, 2), 1));
-    scene->spheres[0].ambient = Vec3f(0, 0, 0.5);
-    scene->spheres[0].diffuse = Vec3f(0.6, 0.4, 1.0);
-    scene->spheres[0].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->Add(Sphere(Vector(-1.0f, 0.0f, 2), 1));
+    scene->spheres[0].ambient = Vector(0, 0, 0.5);
+    scene->spheres[0].diffuse = Vector(0.6, 0.4, 1.0);
+    scene->spheres[0].specular = Vector(1.0, 1.0, 1.0);
     scene->spheres[0].shininess = 5;
 
-    scene->Add(Sphere(Vec3f(1.5f, 0.0f, 2), 1));
-    scene->spheres[1].ambient = Vec3f(0.5, 0, 0);
-    scene->spheres[1].diffuse = Vec3f(0.5, 0, 0);
-    scene->spheres[1].specular = Vec3f(1, 1, 1);
+    scene->Add(Sphere(Vector(1.5f, 0.0f, 2), 1));
+    scene->spheres[1].ambient = Vector(0.5, 0, 0);
+    scene->spheres[1].diffuse = Vector(0.5, 0, 0);
+    scene->spheres[1].specular = Vector(1, 1, 1);
     scene->spheres[1].shininess = 5;
 
     scene->Add(Light{
-        .position = Vec3f(-10,10,2),
-        .ambient = Vec3f(0.4, 0.4, 0.4),
-        .diffuse = Vec3f(0.8, 0.8, 0.8),
-        .specular = Vec3f(1, 1, 1)
+        .position = Vector(-10,10,2),
+        .ambient = Vector(0.4, 0.4, 0.4),
+        .diffuse = Vector(0.8, 0.8, 0.8),
+        .specular = Vector(1, 1, 1)
     });
 }
 

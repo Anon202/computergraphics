@@ -1,19 +1,19 @@
 #include "Camera.h"
 
 Camera::Camera() {
-    this->position = Vec3f(0,0,0);
-    this->up = Vec3f(0,1,0);
-    this->lookAt = Vec3f(0,0,0);
+    this->position = Vector(0,0,0);
+    this->up = Vector(0,1,0);
+    this->lookAt = Vector(0,0,0);
 }
 
-Camera::Camera(Vec3f pos, Vec3f u, Vec3f look) : position(pos), up(u), lookAt(look) {
+Camera::Camera(Vector pos, Vector u, Vector look) : position(pos), up(u), lookAt(look) {
     CalculateWUV();
 }
 
 void Camera::CalculateWUV() {
-    w = (lookAt - position).normalize();
-    u = up.cross(w).normalize();
-    v = w.cross(u);
+    w = (lookAt - position).Normalized();
+    u = up.Cross(w).Normalized();
+    v = w.Cross(u);
 }
 
 void Camera::Move(char dir) {

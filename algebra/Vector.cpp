@@ -8,22 +8,22 @@ Vector::Vector(float x, float y, float z) : x(x), y(y), z(z) {}
 
 Vector::Vector() : x(0), y(0), z(0) {}
 
-Vector Vector::Add(Vector v) const {
+Vector Vector::Add(const Vector& v) const {
     return Vector(this->x + v.x, this->y + v.y, this->z + v.z);
 }
 
-Vector Vector::Subtract(Vector v) const {
+Vector Vector::Subtract(const Vector& v) const {
     return Vector(this->x - v.x, this->y - v.y, this->z - v.z);
 }
 
-Vector Vector::Cross(Vector v) const {
+Vector Vector::Cross(const Vector& v) const {
     float newx = this->y*v.z - this->z*v.y;
     float newy = this->z*v.x - this->x*v.z;
     float newz = this->x*v.y - this->y*v.x;
     return Vector(newx, newy, newz);
 }
 
-float Vector::Dot(Vector v) const {
+float Vector::Dot(const Vector& v) const {
     return this->x*v.x + this->y*v.y + this->z*v.z;
 }
 
@@ -31,13 +31,25 @@ float Vector::Length() const {
     return sqrt(this->x*this->x + this->y*this->y + this->z*this->z); 
 }
 
+Vector& Vector::Normalize() {
+    float invLength = 1.0 / this->Length();
+    this->x *= invLength;
+    this->y *= invLength;
+    this->z *= invLength;
+    return *this;
+}
+
 Vector Vector::Normalized() const {
-    float length = this->Length();
-    return Vector(this->x/length, this->y/length, this->z/length);
+    Vector v(*this);
+    return v.Normalize();
 }
 
 Vector Vector::ScalarMult(float c) const {
     return Vector(this->x*c, this->y*c, this->z*c);
+}
+
+Vector Vector::MultCoordwise(const Vector& v) const {
+    return Vector(this->x * v.x, this->y * v.y, this->z * v.z);
 }
 
 void Vector::Print(const char *name) const {

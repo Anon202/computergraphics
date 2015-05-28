@@ -39,20 +39,21 @@ Color SimpleRayTracer::Lightning(Vec3f rayOrigin, const HitRec& hitRec, int dept
         Color specular = sphere.specular.multCoordwise(light.specular) *
                          pow(max(r.dot(v), 0.0f), sphere.shininess);
         
+        Ray shadowRay;
+        shadowRay.o = hitRec.p;
+        shadowRay.d = l;
+        HitRec shadowHitRec = this->SearchClosestHit(shadowRay, hitRec.primIndex);
+        if (shadowHitRec.anyHit) {
+            color += ambient;
+            continue;
+        }
+        
         Ray newRay;
         newRay.o = hitRec.p;
         newRay.d = r;
         newRay.EpsMoveStartAlongSurfaceNormal(n);
         Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.dot(v), 0.0f), sphere.shininess);
         
-        Ray shadowRay;
-        shadowRay.o = hitRec.p;
-        shadowRay.d = l;
-        HitRec shadowHitRec = this->SearchClosestHit(shadowRay, hitRec.primIndex);
-        if (shadowHitRec.anyHit) {
-            color += ambient + ref;
-            continue;
-        }
         color += ambient + diffuse + specular + ref;
     }
     return color;

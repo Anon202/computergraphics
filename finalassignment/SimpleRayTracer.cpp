@@ -24,41 +24,52 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
     this->image = image;
 }
 
-Color SimpleRayTracer::Lightning(const HitRec& hitRec, int depth) {
+Color SimpleRayTracer::Lightning(Vec3f rayOrigin, const HitRec& hitRec, int depth) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
-    Light light = Light{
-        .position = Vec3f(-5, -3, 1),
-        .ambient = Vec3f(0.4, 0.4, 0.4),
-        .diffuse = Vec3f(0.8, 0.8, 0.8),
-        .specular = Vec3f(1, 1, 1)
-    };
+    Color color = Color(0,0,0);
+    for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
+        Light light = this->scene->lights[i];
 
-    Vec3f v = (-hitRec.p).normalize();
-    Vec3f n = (hitRec.n * 1).normalize();
-    Vec3f l = (hitRec.p - light.position).normalize();
-    Vec3f r =  (l - n*2.0*n.dot(l)).normalize(); // reflect(-l, n)
-    Color ambient = sphere.ambient.multCoordwise(light.ambient);
-    Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
-    Color specular = sphere.specular.multCoordwise(light.specular) *
-                     pow(max(r.dot(v), 0.0f), sphere.shininess);
-    Ray newRay;
-    newRay.o = hitRec.p;
-    newRay.d = r;
-    Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.dot(v), 0.0f), sphere.shininess);
-    return ambient + diffuse + specular + ref;
+        Vec3f v = (rayOrigin - hitRec.p).normalize();
+        Vec3f n = (hitRec.n * 1).normalize();
+        Vec3f l = (light.position - hitRec.p).normalize();
+        Vec3f r = (n*2.0*n.dot(l) - l).normalize(); // reflect(-l, n)
+        Color ambient = sphere.ambient.multCoordwise(light.ambient);
+        Color diffuse = sphere.diffuse.multCoordwise(light.diffuse) * max(n.dot(l), 0.0f);
+        Color specular = sphere.specular.multCoordwise(light.specular) *
+                         pow(max(r.dot(v), 0.0f), sphere.shininess);
+        
+        Ray newRay;
+        newRay.o = hitRec.p;
+        newRay.d = r;
+        newRay.EpsMoveStartAlongSurfaceNormal(n);
+        Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.dot(v), 0.0f), sphere.shininess);
+        
+        Ray shadowRay;
+        shadowRay.o = hitRec.p;
+        shadowRay.d = l;
+        HitRec shadowHitRec = this->SearchClosestHit(shadowRay, hitRec.primIndex);
+        if (shadowHitRec.anyHit) {
+            color += ambient + ref;
+            continue;
+        }
+        color += ambient + diffuse + specular + ref;
+    }
+    return color;
 }
 
-HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray) {
-    float maxZ = -std::numeric_limits<float>::max();
+HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray, int ignore=-1) {
     HitRec closestHit;
+    closestHit.tHit = std::numeric_limits<float>::max();
     HitRec hitRec;
     closestHit.anyHit = false;
-    for (unsigned int i = 0; i < this->scene->spheres.size(); i++) {
+    for (int i = 0; i < (int)this->scene->spheres.size(); i++) {
+        if (i == ignore) {
+            continue;
+        }
         this->tests_done++;
-        if (this->scene->spheres[i].Hit(ray, hitRec) && this->scene->spheres[i].c.z > maxZ) {
-            this->scene->spheres[i].ComputeSurfaceHitFields(ray, hitRec);
+        if (this->scene->spheres[i].Hit(ray, hitRec) && hitRec.tHit < closestHit.tHit) {
             closestHit = hitRec;
-            maxZ = this->scene->spheres[i].c.z;
             closestHit.primIndex = i;
         }
     }
@@ -71,7 +82,7 @@ Color SimpleRayTracer::CastRay(const Ray& ray, int depth) {
     }
     HitRec hitRec = SearchClosestHit(ray);
     if (hitRec.anyHit) {
-        return Lightning(hitRec, depth); 
+        return Lightning(ray.o, hitRec, depth); 
     } else {
         return Color(0,0,0);
     }

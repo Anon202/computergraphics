@@ -14,8 +14,6 @@ public:
     float shininess;
     Sphere(const Vec3f & cen, float rad);
     bool Hit(const Ray & r, HitRec & rec) const;
-    void ComputeSurfaceHitFields(const Ray & r, HitRec & rec) const;
-
 };
 
 #endif

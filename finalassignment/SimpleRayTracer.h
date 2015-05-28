@@ -7,20 +7,13 @@
 #include "Vec3.h"
 #include "Camera.h"
 
-typedef struct _Light {
-    Vec3f position;
-    Vec3f ambient;
-    Vec3f diffuse;
-    Vec3f specular;
-} Light;
-
 class SimpleRayTracer {
 private:
     Scene* scene;
     Image* image;
     Vec3f GetEyeRayDirection(int x, int y);
     int tests_done;
-    HitRec SearchClosestHit(const Ray& ray);
+    HitRec SearchClosestHit(const Ray& ray, int ignore);
 
 public:
     Camera cam;
@@ -29,7 +22,7 @@ public:
     Image* GetImage(void);
     int TestsDone(void);
     Color CastRay(const Ray& ray, int depth);
-    Color Lightning(const HitRec& hitRec, int depth);
+    Color Lightning(Vec3f rayOrigin, const HitRec& hitRec, int depth);
 };
 
 #endif

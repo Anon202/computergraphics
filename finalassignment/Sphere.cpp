@@ -9,22 +9,26 @@ Sphere::Sphere(const Vec3f& cen, float rad) : c(cen), r(rad) {
 
 bool Sphere::Hit(const Ray &r, HitRec &rec) const {
     Vec3f v = r.o - this->c;
+    float a = r.d.dot(r.d);
     float b = 2*v.dot(r.d);
     float c = v.dot(v) - this->r*this->r;
-    float d = b*b - 4*c;
+    float d = b*b - 4*a*c;
     if (d < 0) {
         rec.anyHit = false;
         return false;
     }
-    float t1 = (-b + sqrt(d))/2;
-    float t2 = (-b - sqrt(d))/2;
-    rec.tHit = (t1 > 0)? t1 : t2;
+    float t1 = (-b - sqrt(d))/(2*a);
+    float t2 = (-b + sqrt(d))/(2*a);
+    if (t1 >= 0) {
+        rec.tHit = t1;
+    } else if (t2 >= 0) {
+        rec.tHit = t2;
+    } else {
+        rec.anyHit = false;
+        return false;
+    }
     rec.anyHit = true;
-    return true;
-}
-
-
-void Sphere::ComputeSurfaceHitFields(const Ray & r, HitRec & rec) const {
     rec.p = r.o + r.d * rec.tHit;
     rec.n = (rec.p - this->c).normalize();
+    return true;
 }

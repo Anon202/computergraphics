@@ -20,6 +20,8 @@ void glSetPixel(int x, int y, const Vec3f & c) {
 }
 
 SimpleRayTracer *rayTracer;
+void shadowsCase(Scene* scene);
+void testCase1(Scene* scene);
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -74,8 +76,17 @@ void init(int argc, char **argv) {
     glutKeyboardFunc(keypress);
 
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-    
+
     Scene* scene = new Scene;
+    testCase1(scene);
+
+    Image *image = new Image(640, 480);
+
+    rayTracer = new SimpleRayTracer(scene, image);
+    rayTracer->cam = Camera(Vec3f(0,0,10), Vec3f(0,1,0), Vec3f(0,0,0));
+}
+
+void testCase1(Scene* scene) { 
     scene->Add(Sphere(Vec3f(-1.0f, 0.5f, -6.0f), 0.5f));
     scene->spheres[0].ambient = Vec3f(0, 0, 0.5);
     scene->spheres[0].diffuse = Vec3f(0.6, 0.4, 1.0);
@@ -88,16 +99,45 @@ void init(int argc, char **argv) {
     scene->spheres[1].specular = Vec3f(1, 1, 1);
     scene->spheres[1].shininess = 5;
     
-    scene->Add(Sphere(Vec3f(1.0f, 0.0f, -4.0f), 0.5f));
+    scene->Add(Sphere(Vec3f(0.5f, 0.0f, -4.0f), 0.5f));
     scene->spheres[2].ambient = Vec3f(0, 0.5, 0);
     scene->spheres[2].diffuse = Vec3f(0, 0.5, 0);
     scene->spheres[2].specular = Vec3f(1.0, 1.0, 1.0);
     scene->spheres[2].shininess = 5;
+    
+    scene->Add(Sphere(Vec3f(1.0f, 0.0f, -10.0f), 3.0f));
+    scene->spheres[3].ambient = Vec3f(0.8, 0.8, 0);
+    scene->spheres[3].diffuse = Vec3f(0.3, 0.3, 0);
+    scene->spheres[3].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->spheres[3].shininess = 10;
 
-    Image *image = new Image(640, 480);
+    scene->Add(Light{
+        .position = Vec3f(10, 5, -5),
+        .ambient = Vec3f(0.4, 0.4, 0.4),
+        .diffuse = Vec3f(0.8, 0.8, 0.8),
+        .specular = Vec3f(1, 1, 1)
+    });
+}
 
-    rayTracer = new SimpleRayTracer(scene, image);
-    rayTracer->cam = Camera(Vec3f(0,0,0), Vec3f(0,1,0), Vec3f(0,0,0));
+void shadowsCase(Scene* scene) {
+    scene->Add(Sphere(Vec3f(-1.0f, 0.0f, 2), 1));
+    scene->spheres[0].ambient = Vec3f(0, 0, 0.5);
+    scene->spheres[0].diffuse = Vec3f(0.6, 0.4, 1.0);
+    scene->spheres[0].specular = Vec3f(1.0, 1.0, 1.0);
+    scene->spheres[0].shininess = 5;
+
+    scene->Add(Sphere(Vec3f(1.5f, 0.0f, 2), 1));
+    scene->spheres[1].ambient = Vec3f(0.5, 0, 0);
+    scene->spheres[1].diffuse = Vec3f(0.5, 0, 0);
+    scene->spheres[1].specular = Vec3f(1, 1, 1);
+    scene->spheres[1].shininess = 5;
+
+    scene->Add(Light{
+        .position = Vec3f(-10,10,2),
+        .ambient = Vec3f(0.4, 0.4, 0.4),
+        .diffuse = Vec3f(0.8, 0.8, 0.8),
+        .specular = Vec3f(1, 1, 1)
+    });
 }
 
 int main(int argc, char **argv) {

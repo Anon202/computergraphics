@@ -3,12 +3,12 @@
 #include <glut.h>
 #include <omp.h>
 
-#include "../algebra/Vector.h"
 #include "Image.h"
 #include "Sphere.h"
 #include "Scene.h"
 #include "SimpleRayTracer.h"
-#include "Camera.h"
+#include "../algebra/Vector.h"
+#include "../common/Camera.h"
 
 using namespace std;
 using namespace algebra;
@@ -20,7 +20,7 @@ void glSetPixel(int x, int y, const Vector & c) {
     glEnd();
 }
 
-SimpleRayTracer *rayTracer;
+SimpleRayTracer *rayTracer = NULL;
 bool benchmark = false;
 void shadowsCase(Scene* scene);
 void testCase1(Scene* scene);
@@ -80,8 +80,7 @@ void init(int argc, char **argv) {
 
     Image *image = new Image(640, 480);
 
-    rayTracer = new SimpleRayTracer(scene, image);
-    rayTracer->cam = Camera(Vector(0,0,10), Vector(0,1,0), Vector(0,0,0));
+    rayTracer = new SimpleRayTracer(scene, image, Camera(Vector(0,0,10)));
 }
 
 void testCase1(Scene* scene) { 

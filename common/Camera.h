@@ -16,6 +16,7 @@ class Camera {
     public:
         const double near_plane, far_plane, fov;
         Camera(double near, double far, double fov, Vector pos);
+        Camera(Vector pos);
         Vector Position();
         Vector ViewDirection();
         Vector Up();

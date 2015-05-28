@@ -10,6 +10,13 @@ Camera::Camera(double near, double far, double fov, Vector pos) :
     this->viewdir = this->xdir.Cross(this->up).Normalized();
 }
 
+Camera::Camera(Vector pos) : near_plane(1), far_plane(10000), fov(60) {
+    this->position = pos;    
+    this->xdir = Vector(1, 0, 0);
+    this->up = Vector(0, 1, 0);
+    this->viewdir = this->xdir.Cross(this->up).Normalized();
+}
+
 Vector Camera::Position() {
     return this->position;
 }

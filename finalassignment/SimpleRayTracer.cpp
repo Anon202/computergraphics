@@ -21,9 +21,8 @@ Vector SimpleRayTracer::GetEyeRayDirection(int x, int y) {
     return Vector(left + x * dx, bottom + y * dy, z).Normalized();
 }
 
-SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image) {
-    this->scene = scene;
-    this->image = image;
+SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :
+    scene(scene), image(image), cam(cam) {
 }
 
 Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
@@ -98,7 +97,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
             Ray ray;
-            ray.o = this->cam.position;
+            ray.o = this->cam.Position();
             ray.d = this->GetEyeRayDirection(x, y);
             Color color = this->CastRay(ray, 1);
             this->image->SetPixel(x, y, color);

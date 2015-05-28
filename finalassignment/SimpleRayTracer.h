@@ -5,7 +5,7 @@
 #include "Scene.h"
 #include "Image.h"
 #include "../algebra/Vector.h"
-#include "Camera.h"
+#include "../common/Camera.h"
 
 class SimpleRayTracer {
 private:
@@ -17,7 +17,7 @@ private:
 
 public:
     Camera cam;
-    SimpleRayTracer(Scene* scene, Image* image);
+    SimpleRayTracer(Scene* scene, Image* image, Camera cam);
     void FireRays(void (*glSetPixel)(int, int, const Vector&));
     Image* GetImage(void);
     Color CastRay(const Ray& ray, int depth);

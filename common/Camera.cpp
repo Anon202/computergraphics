@@ -29,6 +29,10 @@ Vector Camera::Up() {
     return this->up;
 }
 
+Vector Camera::Right() {
+    return this->xdir;
+}
+
 void Camera::Move(char dir) {
     float f = 0.1;
     if (dir < 'A' || dir > 'Z') {

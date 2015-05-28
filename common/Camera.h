@@ -20,6 +20,7 @@ class Camera {
         Vector Position();
         Vector ViewDirection();
         Vector Up();
+        Vector Right();
         void Move(char dir);
         void Rotate(char dir);
         Matrix LookAt();

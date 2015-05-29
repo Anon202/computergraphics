@@ -51,6 +51,12 @@ void keypress(unsigned char key, int x, int y) {
             rayTracer->cam.Move(key);
             display();
             break;
+        case 'i': case 'I':
+        case 'j': case 'J':
+        case 'k': case 'K':
+            rayTracer->cam.Rotate(key);
+            display();
+            break;
         case 's': case 'S':
             rayTracer->GetImage()->Save();
             break;

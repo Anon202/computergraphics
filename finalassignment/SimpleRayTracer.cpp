@@ -22,7 +22,7 @@ Vector SimpleRayTracer::GetEyeRayDirection(int x, int y) {
 }
 
 SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :
-    scene(scene), image(image), cam(cam) {
+    scene(scene), image(image), cam(cam), benchmark(false) {
 }
 
 Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
@@ -53,12 +53,14 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
         color += ambient + diffuse + specular;
     }
     
+    float refCoeff = 0.4;
+
     if (spherem.reflective) {
         Ray reflectRay;
         reflectRay.o = hitRec.p;
         reflectRay.d = (n * 2.0 * v.Dot(n) - v).Normalized();
         reflectRay.EpsMoveStartAlongSurfaceNormal(n);
-        color += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * 0.6;
+        color += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * refCoeff;
     }
 
     if (spherem.transparency) {
@@ -73,7 +75,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             refractRay.d = (n*(nr*cosI - sqrt(cosT2)) - v*nr).Normalized();
             n = (n.Dot(v) < 0)? n : -n;
             refractRay.EpsMoveStartAlongSurfaceNormal(n);
-            color += this->CastRay(refractRay, depth + 1, hitRec.primIndex) * 0.4;
+            color += this->CastRay(refractRay, depth + 1, hitRec.primIndex) * (1 - refCoeff);
         }
     }
 
@@ -125,9 +127,11 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
         }
     }
     
-    float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
-    printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
-            ms, this->tests_done);
+    if (benchmark) {
+        float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
+        printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
+                ms, this->tests_done);
+    }
 }
 
 Image* SimpleRayTracer::GetImage(void) {

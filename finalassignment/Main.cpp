@@ -63,9 +63,9 @@ void keypress(unsigned char key, int x, int y) {
             rayTracer->GetImage()->Save();
             break;
         case 'm': case 'M':
-            benchmark = true;
+            rayTracer->benchmark = true;
             display();
-            benchmark = false;
+            rayTracer->benchmark = false;
             break;
         case 'q': case 'Q':
             exit(0);

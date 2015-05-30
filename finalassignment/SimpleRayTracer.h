@@ -11,12 +11,13 @@ class SimpleRayTracer {
 private:
     Scene* scene;
     Image* image;
-    Vector GetEyeRayDirection(int x, int y);
     int tests_done;
+    Vector GetEyeRayDirection(int x, int y);
     HitRec SearchClosestHit(const Ray& ray, int ignore);
 
 public:
     Camera cam;
+    bool benchmark;
     SimpleRayTracer(Scene* scene, Image* image, Camera cam);
     void FireRays(void (*glSetPixel)(int, int, const Vector&));
     Image* GetImage(void);

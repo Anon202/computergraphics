@@ -1,7 +1,7 @@
 CC := g++
-CFLAGS := -O3 -g -Wall -Werror -std=c++11 -D_USE_MATH_DEFINES -fopenmp
+CFLAGS := -O3 -g -Wall -Werror -std=c++11 -D_USE_MATH_DEFINE -fopenmp
 INCLUDES := -I/usr/include/GL/
-LDFLAGS := -lm -lGL -lGLEW -lglut -lGLU -lbmp 
+LDFLAGS := -lm -lGL -lglut -lGLU -lbmp -pg
 SRCS := Main.cpp Ray.cpp Sphere.cpp Image.cpp Scene.cpp SimpleRayTracer.cpp ../common/Camera.cpp ../algebra/Matrix.cpp ../algebra/Vector.cpp ../algebra/HomVector.cpp
 OBJS := $(SRCS:.cpp=.o)
 MAIN := raytracer

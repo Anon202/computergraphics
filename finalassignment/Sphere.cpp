@@ -5,7 +5,7 @@
 using namespace std;
 using namespace algebra;
 
-Sphere::Sphere(const Vector& cen, float rad) : c(cen), r(rad) {
+Sphere::Sphere(const Vector& cen, float rad, Material mat) : c(cen), r(rad), material(mat) {
 }
 
 bool Sphere::Hit(const Ray &r, HitRec &rec) const {
@@ -30,6 +30,9 @@ bool Sphere::Hit(const Ray &r, HitRec &rec) const {
     }
     rec.anyHit = true;
     rec.p = r.o + r.d * rec.tHit;
+            
     rec.n = (rec.p - this->c).Normalized();
+    
+    
     return true;
 }

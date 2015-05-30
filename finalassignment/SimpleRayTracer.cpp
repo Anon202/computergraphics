@@ -4,7 +4,7 @@
 #include <cmath>
 #include <ctime>
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 5
 
 using namespace std;
 using namespace algebra;
@@ -25,38 +25,75 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :
     scene(scene), image(image), cam(cam) {
 }
 
+Vector RefractVector(Vector normal, Vector incident, float refractionIndex) {
+    float n = refractionIndex;
+    float cosI = -normal.Dot(incident);
+    float sinT2 = n * n * (1.0 - cosI * cosI);
+
+    if (sinT2 > 1.0) {
+        cerr << "Bad refraction vector!" << endl;
+        exit(-1);
+    }
+
+    float cosT = sqrt(1.0 - sinT2);
+    return incident * n + normal * (n * cosI - cosT);
+}
+
 Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
+    Material spherem = sphere.material;
     Color color = Color(0,0,0);
+    Vector v = (rayOrigin - hitRec.p).Normalized();
+    Vector n = hitRec.n.Normalized();
+    
     for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
         Light light = this->scene->lights[i];
 
-        Vector v = (rayOrigin - hitRec.p).Normalized();
-        Vector n = (hitRec.n * 1).Normalized();
         Vector l = (light.position - hitRec.p).Normalized();
         Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
-        Color ambient = sphere.ambient.MultCoordwise(light.ambient);
-        Color diffuse = sphere.diffuse.MultCoordwise(light.diffuse) * max(n.Dot(l), 0.0f);
-        Color specular = sphere.specular.MultCoordwise(light.specular) *
-                         pow(max(r.Dot(v), 0.0f), sphere.shininess);
+        Color ambient = spherem.ambient.MultCoordwise(light.ambient);
+        Color diffuse = spherem.diffuse.MultCoordwise(light.diffuse) * max(n.Dot(l), 0.0f);
+        Color specular = spherem.specular.MultCoordwise(light.specular) *
+                         pow(max(r.Dot(v), 0.0f), spherem.shininess);
         
         Ray shadowRay;
         shadowRay.o = hitRec.p;
         shadowRay.d = l;
         HitRec shadowHitRec = this->SearchClosestHit(shadowRay, hitRec.primIndex);
         if (shadowHitRec.anyHit) {
-            color += ambient;
+            color += ambient * 0.5;
             continue;
         }
-        
-        Ray newRay;
-        newRay.o = hitRec.p;
-        newRay.d = r;
-        newRay.EpsMoveStartAlongSurfaceNormal(n);
-        Color ref = this->CastRay(newRay, depth + 1) * pow(max(r.Dot(v), 0.0f), sphere.shininess);
-        
-        color += ambient + diffuse + specular + ref;
+        color += ambient + diffuse + specular;
     }
+    
+    if (spherem.reflective) {
+        Ray reflectRay;
+        reflectRay.o = hitRec.p;
+        reflectRay.d = (n * 2.0 * v.Dot(n) - v).Normalized();
+        reflectRay.EpsMoveStartAlongSurfaceNormal(n);
+        color += this->CastRay(reflectRay, depth + 1).MultCoordwise(spherem.specular);
+    }
+
+    if (spherem.transparency) {
+        float ni = (n.Dot(v) < 0)? spherem.refractionIndex : 1.0;
+        float nt = (n.Dot(v) < 0)? 1.0 : spherem.refractionIndex;
+        float nr = ni / nt;
+        float cosI = n.Dot(v);
+        float cosT2 = 1.0 - nr*nr*(1.0 - cosI*cosI);
+        if (cosT2 > 0.0) {
+            Ray refractRay;
+            refractRay.o = hitRec.p;
+            refractRay.d = (n*(nr*cosI - sqrt(cosT2)) - v*nr).Normalized();
+            n = (n.Dot(v) < 0)? n : -n;
+            refractRay.EpsMoveStartAlongSurfaceNormal(n);
+            HitRec refractHitRec = this->SearchClosestHit(refractRay, hitRec.primIndex);
+            if (refractHitRec.anyHit) {
+                color += this->CastRay(refractRay, depth + 1) * 0.4;
+            }
+        }
+    }
+
     return color;
 }
 

@@ -194,7 +194,7 @@ void reflectionsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = true,
-        .refractionIndex = 3
+        .refractionIndex = 1.05
     };
     scene->Add(Sphere(Vector(1.2f, 0.0f, 5.0f), 1, m2));
 
@@ -213,6 +213,13 @@ void reflectionsCase(Scene* scene) {
     
     scene->Add(Light{
         .position = Vector(0,10,10),
+        .ambient = Vector(0.4, 0.4, 0.4),
+        .diffuse = Vector(0.8, 0.8, 0.8),
+        .specular = Vector(1, 1, 1)
+    });
+    
+    scene->Add(Light{
+        .position = Vector(10,-10,-10),
         .ambient = Vector(0.4, 0.4, 0.4),
         .diffuse = Vector(0.8, 0.8, 0.8),
         .specular = Vector(1, 1, 1)

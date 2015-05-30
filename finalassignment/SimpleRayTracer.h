@@ -20,7 +20,7 @@ public:
     SimpleRayTracer(Scene* scene, Image* image, Camera cam);
     void FireRays(void (*glSetPixel)(int, int, const Vector&));
     Image* GetImage(void);
-    Color CastRay(const Ray& ray, int depth);
+    Color CastRay(const Ray& ray, int depth, int ignore);
     Color Lightning(Vector rayOrigin, const HitRec& hitRec, int depth);
 };
 

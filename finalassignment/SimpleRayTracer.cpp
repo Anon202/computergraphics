@@ -25,20 +25,6 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :
     scene(scene), image(image), cam(cam) {
 }
 
-Vector RefractVector(Vector normal, Vector incident, float refractionIndex) {
-    float n = refractionIndex;
-    float cosI = -normal.Dot(incident);
-    float sinT2 = n * n * (1.0 - cosI * cosI);
-
-    if (sinT2 > 1.0) {
-        cerr << "Bad refraction vector!" << endl;
-        exit(-1);
-    }
-
-    float cosT = sqrt(1.0 - sinT2);
-    return incident * n + normal * (n * cosI - cosT);
-}
-
 Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
     Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
     Material spherem = sphere.material;
@@ -72,7 +58,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
         reflectRay.o = hitRec.p;
         reflectRay.d = (n * 2.0 * v.Dot(n) - v).Normalized();
         reflectRay.EpsMoveStartAlongSurfaceNormal(n);
-        color += this->CastRay(reflectRay, depth + 1).MultCoordwise(spherem.specular);
+        color += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * 0.6;
     }
 
     if (spherem.transparency) {
@@ -87,10 +73,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             refractRay.d = (n*(nr*cosI - sqrt(cosT2)) - v*nr).Normalized();
             n = (n.Dot(v) < 0)? n : -n;
             refractRay.EpsMoveStartAlongSurfaceNormal(n);
-            HitRec refractHitRec = this->SearchClosestHit(refractRay, hitRec.primIndex);
-            if (refractHitRec.anyHit) {
-                color += this->CastRay(refractRay, depth + 1) * 0.4;
-            }
+            color += this->CastRay(refractRay, depth + 1, hitRec.primIndex) * 0.4;
         }
     }
 
@@ -115,11 +98,11 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray, int ignore=-1) {
     return closestHit;
 }
 
-Color SimpleRayTracer::CastRay(const Ray& ray, int depth) {
+Color SimpleRayTracer::CastRay(const Ray& ray, int depth, int ignore = -1) {
     if (depth > MAX_DEPTH) {
         return Color(0,0,0);
     }
-    HitRec hitRec = SearchClosestHit(ray);
+    HitRec hitRec = SearchClosestHit(ray, ignore);
     if (hitRec.anyHit) {
         return Lightning(ray.o, hitRec, depth); 
     } else {
@@ -138,18 +121,13 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
             ray.d = this->GetEyeRayDirection(x, y);
             Color color = this->CastRay(ray, 1);
             this->image->SetPixel(x, y, color);
+            glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
     
     float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
     printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
             ms, this->tests_done);
-    
-    for (int y = 0; y < this->image->GetHeight(); y++) {
-        for (int x = 0; x < this->image->GetWidth(); x++) {
-            glSetPixel(x, y, this->image->GetPixel(x, y));
-        }
-    }
 }
 
 Image* SimpleRayTracer::GetImage(void) {

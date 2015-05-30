@@ -18,7 +18,7 @@ Vector SimpleRayTracer::GetEyeRayDirection(int x, int y) {
     static float bottom = -sizeY * 0.5f;
     static float dx =  sizeX / float(image->GetWidth());
     static float dy =  sizeY / float(image->GetHeight());
-    return Vector(left + x * dx, bottom + y * dy, z).Normalized();
+    return this->cam.LookAt() * Vector(left + x * dx, bottom + y * dy, z).Normalized();
 }
 
 SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :

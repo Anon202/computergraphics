@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <glut.h>
-#include <omp.h>
 
 #include "Image.h"
 #include "Sphere.h"
@@ -84,7 +83,7 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    shadowsCase(scene);
+    reflectionsCase(scene);
 
     Image *image = new Image(640, 480);
 
@@ -231,7 +230,6 @@ void reflectionsCase(Scene* scene) {
 }
 
 int main(int argc, char **argv) {
-    cout << "There are " << omp_get_num_procs() << " procs." << endl;
     init(argc, argv);
     glutMainLoop();
     return 0;

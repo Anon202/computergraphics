@@ -4,8 +4,9 @@
 #include <cmath>
 #include <ctime>
 
+#define NUM_THREADS 4
 #define MAX_DEPTH 5
-#define LIGHT_SAMPLES 3
+#define LIGHT_SAMPLES 50
 #define REFLECT_RAYS 1
 
 using namespace std;
@@ -141,24 +142,55 @@ Color SimpleRayTracer::CastRay(const Ray& ray, int depth, int ignore = -1) {
     }
 }
 
+pthread_mutex_t numThreadsMutex = PTHREAD_MUTEX_INITIALIZER;
+int threadCount = 0;
+
+void *run_thread(void *arg) {
+    SimpleRayTracer *tracer = (SimpleRayTracer*)arg;
+    pthread_mutex_lock(&numThreadsMutex);
+    int threadNum = threadCount++;
+    pthread_mutex_unlock(&numThreadsMutex);
+    for (int y = 0; y < tracer->image->GetHeight(); y++) {
+        for (int x = 0; x < tracer->image->GetWidth(); x++) {
+            if ((x * tracer->image->GetWidth() + y) % NUM_THREADS == threadNum) { 
+                Ray ray;
+                ray.o = tracer->cam.Position();
+                ray.d = tracer->GetEyeRayDirection(x, y);
+                Color color = tracer->CastRay(ray, 1);
+                tracer->image->SetPixel(x, y, color);
+            }
+        }
+    }
+    pthread_exit(NULL);
+}
+
 void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
     this->tests_done = 0;
     clock_t t = clock();
 
+    threadCount = 0;
+    pthread_t thread[NUM_THREADS];
+    int error;
+    for (int i = 0; i < NUM_THREADS; i++) {
+        if ((error = pthread_create(&thread[i], NULL, run_thread, (void*)this))){
+            cerr << "Failed to create thread #" << i << ",number: " << error << "\n";
+            exit(-1);
+        }
+    }
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(thread[i], NULL);
+    }
+
     for (int y = 0; y < this->image->GetHeight(); y++) {
         for (int x = 0; x < this->image->GetWidth(); x++) {
-            Ray ray;
-            ray.o = this->cam.Position();
-            ray.d = this->GetEyeRayDirection(x, y);
-            Color color = this->CastRay(ray, 1);
-            this->image->SetPixel(x, y, color);
             glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
-    benchmark = true;   
+
     if (benchmark) {
-        float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
-        printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",
+        float ms = (float)(clock() - t)/CLOCKS_PER_SEC;
+        printf("Fire rays time: %.4fs, ray-sphere intersection tests: %d\n",
                 ms, this->tests_done);
     }
 }

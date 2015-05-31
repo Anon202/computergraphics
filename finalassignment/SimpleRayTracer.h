@@ -10,12 +10,10 @@
 class SimpleRayTracer {
 private:
     Scene* scene;
-    Image* image;
     int tests_done;
-    Vector GetEyeRayDirection(int x, int y);
-    HitRec SearchClosestHit(const Ray& ray, int ignore);
 
 public:
+    Image* image;
     Camera cam;
     bool benchmark;
     SimpleRayTracer(Scene* scene, Image* image, Camera cam);
@@ -23,6 +21,8 @@ public:
     Image* GetImage(void);
     Color CastRay(const Ray& ray, int depth, int ignore);
     Color Lightning(Vector rayOrigin, const HitRec& hitRec, int depth);
+    Vector GetEyeRayDirection(int x, int y);
+    HitRec SearchClosestHit(const Ray& ray, int ignore);
 };
 
 #endif

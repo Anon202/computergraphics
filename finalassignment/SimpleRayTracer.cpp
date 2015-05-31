@@ -5,7 +5,8 @@
 #include <ctime>
 
 #define MAX_DEPTH 5
-#define LIGHT_SAMPLES 100
+#define LIGHT_SAMPLES 3
+#define REFLECT_RAYS 1
 
 using namespace std;
 using namespace algebra;
@@ -78,11 +79,17 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
     float refCoeff = 0.4;
 
     if (spherem.reflective) {
-        Ray reflectRay;
-        reflectRay.o = hitRec.p;
-        reflectRay.d = (n * 2.0 * v.Dot(n) - v).Normalized();
-        reflectRay.EpsMoveStartAlongSurfaceNormal(n);
-        color += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * refCoeff;
+        Color refColor = Color(0,0,0);
+        for (int i = 0; i < REFLECT_RAYS; i++) {
+            Ray reflectRay;
+            reflectRay.o = hitRec.p;
+            reflectRay.d = n * 2.0 * v.Dot(n) - v;
+            //reflectRay.RandomlyMoveDirection();
+            reflectRay.d = reflectRay.d.Normalized();
+            reflectRay.EpsMoveStartAlongSurfaceNormal(n);
+            refColor += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * refCoeff;
+        }
+        color += refColor * (1.0f/(float)REFLECT_RAYS);
     }
 
     if (spherem.transparency) {
@@ -148,7 +155,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
             glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
-    
+    benchmark = true;   
     if (benchmark) {
         float ms = (float)(clock() - t)/CLOCKS_PER_SEC * 1000;
         printf("Fire rays time: %.4fms, ray-sphere intersection tests: %d\n",

@@ -7,6 +7,7 @@
 #include "Sphere.h"
 #include "Scene.h"
 #include "SimpleRayTracer.h"
+#include "Light.h"
 #include "../algebra/Vector.h"
 #include "../common/Camera.h"
 
@@ -136,12 +137,13 @@ void testCase1(Scene* scene) {
     };
     scene->Add(Sphere(Vector(1.0f, 0.0f, -10.0f), 3.0f, m4));
 
-    scene->Add(Light{
-        .position = Vector(10, 5, -5),
-        .ambient = Vector(0.4, 0.4, 0.4),
-        .diffuse = Vector(0.8, 0.8, 0.8),
-        .specular = Vector(1, 1, 1)
-    });
+    scene->Add(Light(
+        Vector(10, 5, -5),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        0
+    ));
 }
 
 void shadowsCase(Scene* scene) {
@@ -167,12 +169,13 @@ void shadowsCase(Scene* scene) {
     };
     scene->Add(Sphere(Vector(1.5f, 0.0f, 2), 1, m2));
     
-    scene->Add(Light{
-        .position = Vector(-10,10,2),
-        .ambient = Vector(0.4, 0.4, 0.4),
-        .diffuse = Vector(0.8, 0.8, 0.8),
-        .specular = Vector(1, 1, 1)
-    });
+    scene->Add(Light(
+        Vector(-10,10,2),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        2
+    ));
 }
 
 void reflectionsCase(Scene* scene) {
@@ -211,19 +214,21 @@ void reflectionsCase(Scene* scene) {
     scene->Add(Sphere(Vector(1.2f, 0.0f, 0.0f), 1, m3));
     scene->Add(Sphere(Vector(2.0f, 1.0f, 2.0f), 1, m1));
     
-    scene->Add(Light{
-        .position = Vector(0,10,10),
-        .ambient = Vector(0.4, 0.4, 0.4),
-        .diffuse = Vector(0.8, 0.8, 0.8),
-        .specular = Vector(1, 1, 1)
-    });
+    scene->Add(Light(
+        Vector(0,10,10),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        2
+    ));
     
-    scene->Add(Light{
-        .position = Vector(10,-10,-10),
-        .ambient = Vector(0.4, 0.4, 0.4),
-        .diffuse = Vector(0.8, 0.8, 0.8),
-        .specular = Vector(1, 1, 1)
-    });
+    scene->Add(Light(
+        Vector(10,-10,-10),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        2
+    ));
 }
 
 void transparencyCase(Scene* scene) {
@@ -249,12 +254,13 @@ void transparencyCase(Scene* scene) {
     };
     scene->Add(Sphere(Vector(0.0f, 0.0f, 2.0f), 3, m2));
     
-    scene->Add(Light{
-        .position = Vector(0,10,10),
-        .ambient = Vector(0.4, 0.4, 0.4),
-        .diffuse = Vector(0.8, 0.8, 0.8),
-        .specular = Vector(1, 1, 1)
-    });
+    scene->Add(Light(
+        Vector(0,10,10),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        2
+    ));
 }
 
 int main(int argc, char **argv) {

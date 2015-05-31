@@ -5,6 +5,7 @@
 #include <ctime>
 
 #define MAX_DEPTH 5
+#define LIGHT_SAMPLES 10
 
 using namespace std;
 using namespace algebra;
@@ -35,11 +36,11 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
     for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
         Light light = this->scene->lights[i];
 
-        Vector l = (light.position - hitRec.p).Normalized();
+        Vector l = (light.Position() - hitRec.p).Normalized();
         Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
-        Color ambient = spherem.ambient.MultCoordwise(light.ambient);
-        Color diffuse = spherem.diffuse.MultCoordwise(light.diffuse) * max(n.Dot(l), 0.0f);
-        Color specular = spherem.specular.MultCoordwise(light.specular) *
+        Color ambient = spherem.ambient.MultCoordwise(light.Ambient());
+        Color diffuse = spherem.diffuse.MultCoordwise(light.Diffuse()) * max(n.Dot(l), 0.0f);
+        Color specular = spherem.specular.MultCoordwise(light.Specular()) *
                          pow(max(r.Dot(v), 0.0f), spherem.shininess);
         
         Ray shadowRay;
@@ -50,7 +51,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             color += ambient * 0.5;
             continue;
         }
-        color += ambient + diffuse + specular;
+        color += ambient + diffuse + specular; 
     }
     
     float refCoeff = 0.4;

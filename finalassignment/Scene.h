@@ -3,17 +3,11 @@
 
 #include <vector>
 #include "Sphere.h"
+#include "Light.h"
 #include "../algebra/Vector.h"
 
 using namespace std;
 using namespace algebra;
-
-typedef struct _Light {
-    Vector position;
-    Vector ambient;
-    Vector diffuse;
-    Vector specular;
-} Light;
 
 class Scene {
 public:

@@ -26,7 +26,6 @@ bool benchmark = false;
 void shadowsCase(Scene* scene);
 void testCase1(Scene* scene);
 void reflectionsCase(Scene* scene);
-void transparencyCase(Scene* scene);
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -85,7 +84,7 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    reflectionsCase(scene);
+    shadowsCase(scene);
 
     Image *image = new Image(640, 480);
 
@@ -174,7 +173,7 @@ void shadowsCase(Scene* scene) {
         Vector(0.4, 0.4, 0.4),
         Vector(0.8, 0.8, 0.8),
         Vector(1, 1, 1),
-        2
+        1
     ));
 }
 
@@ -215,11 +214,11 @@ void reflectionsCase(Scene* scene) {
     scene->Add(Sphere(Vector(2.0f, 1.0f, 2.0f), 1, m1));
     
     scene->Add(Light(
-        Vector(0,10,10),
+        Vector(0,5,10),
         Vector(0.4, 0.4, 0.4),
         Vector(0.8, 0.8, 0.8),
         Vector(1, 1, 1),
-        2
+        0.5
     ));
     
     scene->Add(Light(
@@ -227,39 +226,7 @@ void reflectionsCase(Scene* scene) {
         Vector(0.4, 0.4, 0.4),
         Vector(0.8, 0.8, 0.8),
         Vector(1, 1, 1),
-        2
-    ));
-}
-
-void transparencyCase(Scene* scene) {
-    Material m1 = Material{
-        .ambient = Vector(0, 0, 0.5),
-        .diffuse = Vector(0.6, 0.4, 1.0),
-        .specular = Vector(1.0, 1.0, 1.0),
-        .shininess = 5,
-        .reflective = true,
-        .transparency = false,
-        .refractionIndex = 0.5
-    };
-    scene->Add(Sphere(Vector(0.0f, 0.0f, -5.0f), 1, m1));
-
-    Material m2 = Material{
-        .ambient = Vector(0.5, 0, 0),
-        .diffuse = Vector(0.5, 0, 0),
-        .specular = Vector(1, 1, 1),
-        .shininess = 5,
-        .reflective = false,
-        .transparency = true,
-        .refractionIndex = 0.1
-    };
-    scene->Add(Sphere(Vector(0.0f, 0.0f, 2.0f), 3, m2));
-    
-    scene->Add(Light(
-        Vector(0,10,10),
-        Vector(0.4, 0.4, 0.4),
-        Vector(0.8, 0.8, 0.8),
-        Vector(1, 1, 1),
-        2
+        0.5
     ));
 }
 

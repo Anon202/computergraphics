@@ -5,7 +5,7 @@
 #include <ctime>
 
 #define MAX_DEPTH 5
-#define LIGHT_SAMPLES 10
+#define LIGHT_SAMPLES 100
 
 using namespace std;
 using namespace algebra;
@@ -35,23 +35,44 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
     
     for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
         Light light = this->scene->lights[i];
-
-        Vector l = (light.Position() - hitRec.p).Normalized();
-        Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
-        Color ambient = spherem.ambient.MultCoordwise(light.Ambient());
-        Color diffuse = spherem.diffuse.MultCoordwise(light.Diffuse()) * max(n.Dot(l), 0.0f);
-        Color specular = spherem.specular.MultCoordwise(light.Specular()) *
-                         pow(max(r.Dot(v), 0.0f), spherem.shininess);
+        int numShadowHits = 0;
         
-        Ray shadowRay;
-        shadowRay.o = hitRec.p;
-        shadowRay.d = l;
-        HitRec shadowHitRec = this->SearchClosestHit(shadowRay, hitRec.primIndex);
-        if (shadowHitRec.anyHit) {
-            color += ambient * 0.5;
-            continue;
+        for (unsigned int j = 0; j < LIGHT_SAMPLES; j++) { 
+            Vector lightpos = this->scene->lights[i].RandomPoint(); 
+
+            Vector l = (lightpos - hitRec.p).Normalized();
+            Color ambient = spherem.ambient.MultCoordwise(light.Ambient());
+            
+            HitRec shadowHitRec;
+            Ray shadowRay;
+            shadowRay.o = hitRec.p;
+            shadowRay.d = l;
+            shadowRay.EpsMoveStartAlongSurfaceNormal(n);
+            bool hit = false;
+            for (int k = 0; k < (int)this->scene->spheres.size(); k++) {
+                if (k == hitRec.primIndex) {
+                    continue;
+                }
+                this->tests_done++;
+                if (this->scene->spheres[i].Hit(shadowRay, shadowHitRec)) {
+                    numShadowHits++;
+                    hit = true;
+                }
+            }
+            
+            if (hit) {
+                color += ambient;
+            } else {
+                Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
+                Color diffuse = spherem.diffuse.MultCoordwise(light.Diffuse()) *
+                                max(n.Dot(l), 0.0f);
+                Color specular = spherem.specular.MultCoordwise(light.Specular()) *
+                                pow(max(r.Dot(v), 0.0f), spherem.shininess);
+                color += ambient + diffuse + specular;
+            }
         }
-        color += ambient + diffuse + specular; 
+        
+        color = color * (1.0f/(float)LIGHT_SAMPLES);
     }
     
     float refCoeff = 0.4;
@@ -79,7 +100,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             color += this->CastRay(refractRay, depth + 1, hitRec.primIndex) * (1 - refCoeff);
         }
     }
-
+    
     return color;
 }
 

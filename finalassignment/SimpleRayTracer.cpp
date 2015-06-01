@@ -37,8 +37,9 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
     
     for (unsigned int i = 0; i < this->scene->lights.size(); i++) {
         Light light = this->scene->lights[i];
-        int numShadowHits = 0;
         
+        Color c = Color(0,0,0);
+
         for (unsigned int j = 0; j < LIGHT_SAMPLES; j++) { 
             Vector lightpos = this->scene->lights[i].RandomPoint(); 
 
@@ -57,24 +58,23 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
                 }
                 this->tests_done++;
                 if (this->scene->shapes[i]->Hit(shadowRay, shadowHitRec)) {
-                    numShadowHits++;
                     hit = true;
                 }
             }
             
             if (hit) {
-                color += ambient;
+                c += ambient;
             } else {
                 Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
                 Color diffuse = shapem.diffuse.MultCoordwise(light.Diffuse()) *
                                 max(n.Dot(l), 0.0f);
                 Color specular = shapem.specular.MultCoordwise(light.Specular()) *
                                 pow(max(r.Dot(v), 0.0f), shapem.shininess);
-                color += ambient + diffuse + specular;
+                c += ambient + diffuse + specular;
             }
         }
         
-        color = color * (1.0f/(float)LIGHT_SAMPLES);
+        color = color + c * (1.0f/(float)LIGHT_SAMPLES);
     }
     
     float refCoeff = 0.4;
@@ -187,7 +187,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
             glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
-
+    
     if (benchmark) {
         float ms = (float)(clock() - t)/CLOCKS_PER_SEC;
         printf("Fire rays time: %.4fs, ray-shape intersection tests: %d\n",

@@ -45,7 +45,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
 
             Vector l = (lightpos - hitRec.p).Normalized();
             Color ambient = shapem.ambient.MultCoordwise(light.Ambient());
-            
+
             HitRec shadowHitRec;
             Ray shadowRay;
             shadowRay.o = hitRec.p;
@@ -59,6 +59,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
                 this->tests_done++;
                 if (this->scene->shapes[i]->Hit(shadowRay, shadowHitRec)) {
                     hit = true;
+                    break;
                 }
             }
             

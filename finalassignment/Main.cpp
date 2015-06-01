@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "SimpleRayTracer.h"
 #include "Light.h"
+#include "Plane.h"
 #include "../algebra/Vector.h"
 #include "../common/Camera.h"
 
@@ -25,6 +26,7 @@ bool benchmark = false;
 void shadowsCase(Scene* scene);
 void testCase1(Scene* scene);
 void reflectionsCase(Scene* scene);
+void planeCase(Scene* scene);
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -83,7 +85,7 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    reflectionsCase(scene);
+    planeCase(scene);
 
     Image *image = new Image(640, 480);
 
@@ -222,6 +224,63 @@ void reflectionsCase(Scene* scene) {
 
     scene->Add(Light(
         Vector(10,-10,-10),
+        Vector(0.4, 0.4, 0.4),
+        Vector(0.8, 0.8, 0.8),
+        Vector(1, 1, 1),
+        0.5
+    ));
+}
+
+void planeCase(Scene* scene) {
+    // Back plane
+    Material m = Material{
+        .ambient = Vector(1.0, 1.0, 1.0),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0
+    };
+    scene->Add(new Plane(Vector(2, 3, 0), Vector(2, -1, 0), Vector(-4, 3, 0), m));
+   
+    // Right plane
+    Material m3 = Material{
+        .ambient = Vector(0.9, 0.9, 0.9),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0
+    };
+    scene->Add(new Plane(Vector(2, -1, 0), Vector(2, 3, 0), Vector(2, -1, 1), m3));
+   
+    // Bottom plane
+    Material m4 = Material{
+        .ambient = Vector(0.6, 0.6, 0.6),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0
+    };
+    scene->Add(new Plane(Vector(2, -1, 0), Vector(-4, -1, 0), Vector(2, -1, 1), m4));
+
+    Material m2 = Material{
+        .ambient = Vector(0.5, 0, 0),
+        .diffuse = Vector(0.5, 0, 0),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 2
+    };
+    scene->Add(new Sphere(Vector(0.0f, 0.0f, 2.0f), 1, m2));
+    
+    scene->Add(Light(
+        Vector(-5,5,8),
         Vector(0.4, 0.4, 0.4),
         Vector(0.8, 0.8, 0.8),
         Vector(1, 1, 1),

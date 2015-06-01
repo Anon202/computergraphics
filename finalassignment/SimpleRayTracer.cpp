@@ -29,8 +29,8 @@ SimpleRayTracer::SimpleRayTracer(Scene* scene, Image* image, Camera cam) :
 }
 
 Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int depth) {
-    Sphere sphere = this->scene->spheres[hitRec.primIndex]; 
-    Material spherem = sphere.material;
+    Shape* shape = this->scene->shapes[hitRec.primIndex]; 
+    Material shapem = shape->material;
     Color color = Color(0,0,0);
     Vector v = (rayOrigin - hitRec.p).Normalized();
     Vector n = hitRec.n.Normalized();
@@ -43,7 +43,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             Vector lightpos = this->scene->lights[i].RandomPoint(); 
 
             Vector l = (lightpos - hitRec.p).Normalized();
-            Color ambient = spherem.ambient.MultCoordwise(light.Ambient());
+            Color ambient = shapem.ambient.MultCoordwise(light.Ambient());
             
             HitRec shadowHitRec;
             Ray shadowRay;
@@ -51,12 +51,12 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             shadowRay.d = l;
             shadowRay.EpsMoveStartAlongSurfaceNormal(n);
             bool hit = false;
-            for (int k = 0; k < (int)this->scene->spheres.size(); k++) {
+            for (int k = 0; k < (int)this->scene->shapes.size(); k++) {
                 if (k == hitRec.primIndex) {
                     continue;
                 }
                 this->tests_done++;
-                if (this->scene->spheres[i].Hit(shadowRay, shadowHitRec)) {
+                if (this->scene->shapes[i]->Hit(shadowRay, shadowHitRec)) {
                     numShadowHits++;
                     hit = true;
                 }
@@ -66,10 +66,10 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
                 color += ambient;
             } else {
                 Vector r = (n*2.0*n.Dot(l) - l).Normalized(); // reflect(-l, n)
-                Color diffuse = spherem.diffuse.MultCoordwise(light.Diffuse()) *
+                Color diffuse = shapem.diffuse.MultCoordwise(light.Diffuse()) *
                                 max(n.Dot(l), 0.0f);
-                Color specular = spherem.specular.MultCoordwise(light.Specular()) *
-                                pow(max(r.Dot(v), 0.0f), spherem.shininess);
+                Color specular = shapem.specular.MultCoordwise(light.Specular()) *
+                                pow(max(r.Dot(v), 0.0f), shapem.shininess);
                 color += ambient + diffuse + specular;
             }
         }
@@ -79,7 +79,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
     
     float refCoeff = 0.4;
 
-    if (spherem.reflective) {
+    if (shapem.reflective) {
         Color refColor = Color(0,0,0);
         for (int i = 0; i < REFLECT_RAYS; i++) {
             Ray reflectRay;
@@ -93,9 +93,9 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
         color += refColor * (1.0f/(float)REFLECT_RAYS);
     }
 
-    if (spherem.transparency) {
-        float ni = (n.Dot(v) < 0)? spherem.refractionIndex : 1.0;
-        float nt = (n.Dot(v) < 0)? 1.0 : spherem.refractionIndex;
+    if (shapem.transparency) {
+        float ni = (n.Dot(v) < 0)? shapem.refractionIndex : 1.0;
+        float nt = (n.Dot(v) < 0)? 1.0 : shapem.refractionIndex;
         float nr = ni / nt;
         float cosI = n.Dot(v);
         float cosT2 = 1.0 - nr*nr*(1.0 - cosI*cosI);
@@ -117,12 +117,12 @@ HitRec SimpleRayTracer::SearchClosestHit(const Ray& ray, int ignore=-1) {
     closestHit.tHit = std::numeric_limits<float>::max();
     HitRec hitRec;
     closestHit.anyHit = false;
-    for (int i = 0; i < (int)this->scene->spheres.size(); i++) {
+    for (int i = 0; i < (int)this->scene->shapes.size(); i++) {
         if (i == ignore) {
             continue;
         }
         this->tests_done++;
-        if (this->scene->spheres[i].Hit(ray, hitRec) && hitRec.tHit < closestHit.tHit) {
+        if (this->scene->shapes[i]->Hit(ray, hitRec) && hitRec.tHit < closestHit.tHit) {
             closestHit = hitRec;
             closestHit.primIndex = i;
         }
@@ -190,7 +190,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
 
     if (benchmark) {
         float ms = (float)(clock() - t)/CLOCKS_PER_SEC;
-        printf("Fire rays time: %.4fs, ray-sphere intersection tests: %d\n",
+        printf("Fire rays time: %.4fs, ray-shape intersection tests: %d\n",
                 ms, this->tests_done);
     }
 }

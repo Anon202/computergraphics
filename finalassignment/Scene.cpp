@@ -3,8 +3,8 @@
 Scene::Scene(void) {
 }
 
-void Scene::Add(const Sphere& s) {
-    this->spheres.push_back(s);
+void Scene::Add(Shape* s) {
+    this->shapes.push_back(s);
 }
 
 void Scene::Add(const Light& s) {

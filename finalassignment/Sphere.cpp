@@ -1,11 +1,12 @@
 #include "Sphere.h"
+#include "Shape.h"
 #include <cmath>
 #include <iostream>
 
 using namespace std;
 using namespace algebra;
 
-Sphere::Sphere(const Vector& cen, float rad, Material mat) : c(cen), r(rad), material(mat) {
+Sphere::Sphere(const Vector& cen, float rad, Material mat) : Shape(mat), c(cen), r(rad) {
 }
 
 bool Sphere::Hit(const Ray &r, HitRec &rec) const {

@@ -100,7 +100,7 @@ void testCase1(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(-1.0f, 0.5f, -6.0f), 0.5f, m1));
+    scene->Add(new Sphere(Vector(-1.0f, 0.5f, -6.0f), 0.5f, m1));
 
     Material m2 = Material{
         .ambient = Vector(0.5, 0, 0),
@@ -111,7 +111,7 @@ void testCase1(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(0.0f, 0.0f, -5.0f), 0.5f, m2));
+    scene->Add(new Sphere(Vector(0.0f, 0.0f, -5.0f), 0.5f, m2));
 
     Material m3 = Material{
         .ambient = Vector(0, 0.5, 0),
@@ -122,7 +122,7 @@ void testCase1(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(0.5f, 0.0f, -4.0f), 0.5f, m3));
+    scene->Add(new Sphere(Vector(0.5f, 0.0f, -4.0f), 0.5f, m3));
    
     Material m4 = Material{
         .ambient = Vector(0.8, 0.8, 0),
@@ -133,7 +133,7 @@ void testCase1(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(1.0f, 0.0f, -10.0f), 3.0f, m4));
+    scene->Add(new Sphere(Vector(1.0f, 0.0f, -10.0f), 3.0f, m4));
 
     scene->Add(Light(
         Vector(10, 5, -5),
@@ -154,7 +154,7 @@ void shadowsCase(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(-1.0f, 0.0f, 2), 1, m1));
+    scene->Add(new Sphere(Vector(-1.0f, 0.0f, 2), 1, m1));
 
     Material m2 = Material{
         .ambient = Vector(0.5, 0, 0),
@@ -165,7 +165,7 @@ void shadowsCase(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(1.5f, 0.0f, 2), 1, m2));
+    scene->Add(new Sphere(Vector(1.5f, 0.0f, 2), 1, m2));
     
     scene->Add(Light(
         Vector(-10,10,2),
@@ -186,7 +186,7 @@ void reflectionsCase(Scene* scene) {
         .transparency = false,
         .refractionIndex = 0.5
     };
-    scene->Add(Sphere(Vector(-1.5f, 1.0f, 2.0f), 1, m1));
+    scene->Add(new Sphere(Vector(-1.5f, 1.0f, 2.0f), 1, m1));
 
     Material m2 = Material{
         .ambient = Vector(0.5, 0, 0),
@@ -197,7 +197,7 @@ void reflectionsCase(Scene* scene) {
         .transparency = true,
         .refractionIndex = 1.05
     };
-    scene->Add(Sphere(Vector(1.2f, 0.0f, 5.0f), 1, m2));
+    scene->Add(new Sphere(Vector(1.2f, 0.0f, 5.0f), 1, m2));
 
     Material m3 = Material{
         .ambient = Vector(0, 0.5, 0),
@@ -208,9 +208,9 @@ void reflectionsCase(Scene* scene) {
         .transparency = false,
         .refractionIndex = 1.5
     };
-    scene->Add(Sphere(Vector(0.0f, 0.5f, 0.0f), 1, m3));
-    scene->Add(Sphere(Vector(1.2f, 0.0f, 0.0f), 1, m3));
-    scene->Add(Sphere(Vector(2.0f, 1.0f, 2.0f), 1, m1));
+    scene->Add(new Sphere(Vector(0.0f, 0.5f, 0.0f), 1, m3));
+    scene->Add(new Sphere(Vector(1.2f, 0.0f, 0.0f), 1, m3));
+    scene->Add(new Sphere(Vector(2.0f, 1.0f, 2.0f), 1, m1));
     
     scene->Add(Light(
         Vector(0,5,10),
@@ -219,7 +219,7 @@ void reflectionsCase(Scene* scene) {
         Vector(1, 1, 1),
         0.5
     ));
-    
+
     scene->Add(Light(
         Vector(10,-10,-10),
         Vector(0.4, 0.4, 0.4),

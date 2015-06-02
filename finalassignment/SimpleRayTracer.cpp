@@ -8,11 +8,12 @@
 #define MAX_DEPTH 5
 #define LIGHT_SAMPLES 50
 #define REFLECT_RAYS 20
+#define NUM_SAMPLES 3
 
 using namespace std;
 using namespace algebra;
 
-Vector SimpleRayTracer::GetEyeRayDirection(int x, int y) {
+Vector SimpleRayTracer::GetEyeRayDirection(float x, float y) {
     //Uses a fix camera looking along the negative z-axis
     static float z = -5.0f;
     static float sizeX = 4.0f;
@@ -156,11 +157,19 @@ void *run_thread(void *arg) {
     for (int y = 0; y < tracer->image->GetHeight(); y++) {
         for (int x = 0; x < tracer->image->GetWidth(); x++) {
             if ((x * tracer->image->GetWidth() + y) % NUM_THREADS == threadNum) { 
-                Ray ray;
-                ray.o = tracer->cam.Position();
-                ray.d = tracer->GetEyeRayDirection(x, y);
-                Color color = tracer->CastRay(ray, 1);
-                tracer->image->SetPixel(x, y, color);
+                Color color = Color(0,0,0);
+                for (int yy = 0; yy < NUM_SAMPLES; yy++) {
+                    for (int xx = 0; xx < NUM_SAMPLES; xx++) {
+                        float u = (x + (xx + 0.5)/NUM_SAMPLES);
+                        float v = (y + (yy + 0.5)/NUM_SAMPLES);
+                        Ray ray;
+                        ray.o = tracer->cam.Position();
+                        ray.d = tracer->GetEyeRayDirection(u, v);
+                        color += tracer->CastRay(ray, 1);
+                        //cout << x << " " << y << " -> " << u << " " << v << endl;
+                    }
+                }
+                tracer->image->SetPixel(x, y, color * (1.0/(NUM_SAMPLES * NUM_SAMPLES)));
             }
         }
     }
@@ -190,7 +199,8 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
             glSetPixel(x, y, this->image->GetPixel(x, y));
         }
     }
-    
+
+    benchmark = true;
     if (benchmark) {
         float ms = (float)(clock() - t)/CLOCKS_PER_SEC;
         printf("Fire rays time: %.4fs, ray-shape intersection tests: %d\n",

@@ -21,7 +21,7 @@ public:
     Image* GetImage(void);
     Color CastRay(const Ray& ray, int depth, int ignore);
     Color Lightning(Vector rayOrigin, const HitRec& hitRec, int depth);
-    Vector GetEyeRayDirection(int x, int y);
+    Vector GetEyeRayDirection(float x, float y);
     HitRec SearchClosestHit(const Ray& ray, int ignore);
 };
 

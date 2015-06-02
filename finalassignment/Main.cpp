@@ -85,7 +85,7 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    reflectionsCase(scene);
+    planeCase(scene);
 
     Image *image = new Image(640, 480);
 
@@ -240,43 +240,17 @@ void reflectionsCase(Scene* scene) {
     ));
 }
 
-void planeCase(Scene* scene) {
-    // Back plane
-    Material m = Material{
-        .ambient = Vector(1.0, 1.0, 1.0),
-        .diffuse = Vector(0.5, 0.5, 0.5),
-        .specular = Vector(1, 1, 1),
-        .shininess = 5,
-        .reflective = false,
-        .transparency = false,
-        .refractionIndex = 0.0,
-        .blurDegree = 0.0
-    };
-    scene->Add(new Plane(Vector(2, 3, 0), Vector(2, -1, 0), Vector(-4, 3, 0), m));
-   
-    // Right plane
-    Material m3 = Material{
-        .ambient = Vector(0.9, 0.9, 0.9),
-        .diffuse = Vector(0.5, 0.5, 0.5),
-        .specular = Vector(1, 1, 1),
-        .shininess = 5,
-        .reflective = true,
-        .transparency = false,
-        .refractionIndex = 0.0,
-        .blurDegree = 0.0
-    };
-    scene->Add(new Plane(Vector(2, -1, 0), Vector(2, 3, 0), Vector(2, -1, 1), m3));
-   
+void planeCase(Scene* scene) { 
     // Bottom plane
     Material m4 = Material{
         .ambient = Vector(0.6, 0.6, 0.6),
         .diffuse = Vector(0.5, 0.5, 0.5),
         .specular = Vector(1, 1, 1),
         .shininess = 5,
-        .reflective = false,
+        .reflective = true,
         .transparency = false,
         .refractionIndex = 0.0,
-        .blurDegree = 0.0
+        .blurDegree = 0.2
     };
     scene->Add(new Plane(Vector(2, -1, 0), Vector(-4, -1, 0), Vector(2, -1, 1), m4));
 

@@ -1,5 +1,5 @@
 #include "Image.h"
-#include <bmpfile.h>
+#include "EasyBMP/EasyBMP.h"
 #include <cstdlib>
 #include <iostream>
 
@@ -33,19 +33,27 @@ Vector *Image::GetPixelBufferPtr(void) {
     return this->pixels;
 }
 
-void Image::Save(void) {
-    bmpfile_t *bmp;
-    if ((bmp = bmp_create(this->GetWidth(), this->GetHeight(), 8)) == NULL) {
-        cerr << "Invalid depth value: " << 1 << endl;
-        exit(1);
+unsigned int clamp(unsigned int x) {
+    if (x > 255) {
+        return 255;
+    } else if (x < 0) {
+        return 0;
     }
+    return x;
+}
+
+void Image::Save(void) {
+    BMP bmp;
+    bmp.SetSize(this->GetWidth(), this->GetHeight());
+    bmp.SetBitDepth(32);
     for (int i = 0; i < this->GetWidth(); i++) {
         for (int j = 0; j < this->GetHeight(); j++) {
             Vector p = this->GetPixel(i, j);
-            rgb_pixel_t pixel = {(uint8_t)(p.b*255), (uint8_t)(p.g*255), (uint8_t)(p.r*255), 0};
-            bmp_set_pixel(bmp, i, this->GetHeight() - j, pixel);
+            int jcoord = this->GetHeight() - j - 1;
+            bmp(i, jcoord)->Red = clamp((unsigned int)(p.r * 255));
+            bmp(i, jcoord)->Green = clamp((unsigned int)(p.g * 255));
+            bmp(i, jcoord)->Blue = clamp((unsigned int)(p.b * 255));
         }
     }
-    bmp_save(bmp, "image.bmp");
-    bmp_destroy(bmp);
+    bmp.WriteToFile("image.bmp");
 }

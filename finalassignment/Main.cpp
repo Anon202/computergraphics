@@ -85,11 +85,11 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    planeCase(scene);
+    reflectionsCase(scene);
 
     Image *image = new Image(640, 480);
 
-    rayTracer = new SimpleRayTracer(scene, image, Camera(Vector(0,0,10)));
+    rayTracer = new SimpleRayTracer(scene, image, Camera(Vector(1,0,10)));
 }
 
 void testCase1(Scene* scene) { 
@@ -100,7 +100,8 @@ void testCase1(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(-1.0f, 0.5f, -6.0f), 0.5f, m1));
 
@@ -111,7 +112,8 @@ void testCase1(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(0.0f, 0.0f, -5.0f), 0.5f, m2));
 
@@ -122,7 +124,8 @@ void testCase1(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(0.5f, 0.0f, -4.0f), 0.5f, m3));
    
@@ -133,7 +136,8 @@ void testCase1(Scene* scene) {
         .shininess = 10,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(1.0f, 0.0f, -10.0f), 3.0f, m4));
 
@@ -154,7 +158,8 @@ void shadowsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(-1.0f, 0.0f, 2), 1, m1));
 
@@ -165,7 +170,8 @@ void shadowsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(1.5f, 0.0f, 2), 1, m2));
     
@@ -186,7 +192,8 @@ void reflectionsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.5
+        .refractionIndex = 0.5,
+        .blurDegree = 0.1
     };
     scene->Add(new Sphere(Vector(-1.5f, 1.0f, 2.0f), 1, m1));
 
@@ -197,7 +204,8 @@ void reflectionsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = true,
-        .refractionIndex = 1.05
+        .refractionIndex = 1.05,
+        .blurDegree = 0.1
     };
     scene->Add(new Sphere(Vector(1.2f, 0.0f, 5.0f), 1, m2));
 
@@ -208,7 +216,8 @@ void reflectionsCase(Scene* scene) {
         .shininess = 5,
         .reflective = true,
         .transparency = false,
-        .refractionIndex = 1.5
+        .refractionIndex = 1.5,
+        .blurDegree = 0.1
     };
     scene->Add(new Sphere(Vector(0.0f, 0.5f, 0.0f), 1, m3));
     scene->Add(new Sphere(Vector(1.2f, 0.0f, 0.0f), 1, m3));
@@ -240,7 +249,8 @@ void planeCase(Scene* scene) {
         .shininess = 5,
         .reflective = false,
         .transparency = false,
-        .refractionIndex = 0.0
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
     };
     scene->Add(new Plane(Vector(2, 3, 0), Vector(2, -1, 0), Vector(-4, 3, 0), m));
    
@@ -250,9 +260,10 @@ void planeCase(Scene* scene) {
         .diffuse = Vector(0.5, 0.5, 0.5),
         .specular = Vector(1, 1, 1),
         .shininess = 5,
-        .reflective = false,
+        .reflective = true,
         .transparency = false,
-        .refractionIndex = 0.0
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
     };
     scene->Add(new Plane(Vector(2, -1, 0), Vector(2, 3, 0), Vector(2, -1, 1), m3));
    
@@ -264,7 +275,8 @@ void planeCase(Scene* scene) {
         .shininess = 5,
         .reflective = false,
         .transparency = false,
-        .refractionIndex = 0.0
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
     };
     scene->Add(new Plane(Vector(2, -1, 0), Vector(-4, -1, 0), Vector(2, -1, 1), m4));
 
@@ -275,7 +287,8 @@ void planeCase(Scene* scene) {
         .shininess = 5,
         .reflective = false,
         .transparency = false,
-        .refractionIndex = 2
+        .refractionIndex = 2,
+        .blurDegree = 0.0
     };
     scene->Add(new Sphere(Vector(0.0f, 0.0f, 2.0f), 1, m2));
     

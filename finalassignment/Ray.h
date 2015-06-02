@@ -28,7 +28,7 @@ public:
 	Ray(const Vector& o, const Vector& d, float tclip = tMax);
 	void EpsMoveStartAlongSurfaceNormal(const Vector& n);
 	void EpsMoveStartAlongDir();
-    void RandomlyMoveDirection();
+    void RandomlyPerturbDirection(float degrees);
 	static void IncRayEps();
 	static void DecRayEps();
 };

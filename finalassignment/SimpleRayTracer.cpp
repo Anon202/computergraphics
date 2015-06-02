@@ -7,7 +7,7 @@
 #define NUM_THREADS 4
 #define MAX_DEPTH 5
 #define LIGHT_SAMPLES 50
-#define REFLECT_RAYS 1
+#define REFLECT_RAYS 20
 
 using namespace std;
 using namespace algebra;
@@ -82,16 +82,18 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
 
     if (shapem.reflective) {
         Color refColor = Color(0,0,0);
-        for (int i = 0; i < REFLECT_RAYS; i++) {
+        int iters = (shapem.blurDegree > 0.0)? REFLECT_RAYS : 1;
+        for (int i = 0; i < iters; i++) {
             Ray reflectRay;
             reflectRay.o = hitRec.p;
-            reflectRay.d = n * 2.0 * v.Dot(n) - v;
-            //reflectRay.RandomlyMoveDirection();
-            reflectRay.d = reflectRay.d.Normalized();
+            reflectRay.d = (n * 2.0 * v.Dot(n) - v).Normalized();
+            if (shapem.blurDegree > 0.0) {
+                reflectRay.RandomlyPerturbDirection(shapem.blurDegree);
+            }
             reflectRay.EpsMoveStartAlongSurfaceNormal(n);
             refColor += this->CastRay(reflectRay, depth + 1, hitRec.primIndex) * refCoeff;
         }
-        color += refColor * (1.0f/(float)REFLECT_RAYS);
+        color += refColor * (1.0f/(float)iters);
     }
 
     if (shapem.transparency) {

@@ -9,6 +9,7 @@ typedef struct _Material {
     bool reflective;
     bool transparency;
     float refractionIndex;
+    float blurDegree;
 } Material;
 
 class Shape {

@@ -45,7 +45,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
             Vector lightpos = this->scene->lights[i].RandomPoint(); 
 
             Vector l = (lightpos - hitRec.p).Normalized();
-            Color ambient = shapem.ambient.MultCoordwise(light.Ambient());
+            Color ambient = shape->GetColor(hitRec.p).MultCoordwise(light.Ambient());
 
             HitRec shadowHitRec;
             Ray shadowRay;

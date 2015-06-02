@@ -3,7 +3,7 @@
 random_device rd;
 
 mt19937 Light::rnd_gen(rd());
-uniform_real_distribution<float> Light::distribution(-1.0, 1.0);
+uniform_real_distribution<float> Light::distribution(-2.0, 2.0);
 
 Light::Light(Vector position, Vector ambient, Vector diffuse, Vector specular, float radius) :
     position(position), ambient(ambient), diffuse(diffuse), specular(specular), radius(radius) {

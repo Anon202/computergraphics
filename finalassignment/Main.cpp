@@ -27,6 +27,7 @@ void shadowsCase(Scene* scene);
 void testCase1(Scene* scene);
 void reflectionsCase(Scene* scene);
 void planeCase(Scene* scene);
+void universeCase(Scene* scene);
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -85,7 +86,7 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    planeCase(scene);
+    universeCase(scene);
 
     Image *image = new Image(640, 480);
 
@@ -273,6 +274,85 @@ void planeCase(Scene* scene) {
         Vector(1, 1, 1),
         0.5
     ));
+}
+
+void universeCase(Scene* scene) {
+    Material mearth = Material{
+        .ambient = Vector(1.0, 1.0, 1.0),
+        .diffuse = Vector(0.0, 0.0, 0.3),
+        .specular = Vector(1, 1, 1),
+        .shininess = 2,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.5
+    };
+    Sphere* earth = new Sphere(Vector(1,0,0), 1.5, mearth, "textures/img/world.bmp");
+    earth->colorConf = SphereConf::ONLY_TEXTURE;
+    scene->Add(earth);
+
+    Material mmoon = Material{
+        .ambient = Vector(1.0, 1.0, 1.0),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
+    };
+    Sphere* moon = new Sphere(Vector(3,1.5,2), 0.5, mmoon, "textures/img/moon.bmp");
+    moon->colorConf = SphereConf::ONLY_TEXTURE;
+    scene->Add(moon);
+    
+    Material msun = Material{
+        .ambient = Vector(1.0, 1.0, 1.0),
+        .diffuse = Vector(0.3, 0.3, 0.0),
+        .specular = Vector(0,0,0),
+        .shininess = 15,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
+    };
+    Sphere* sun = new Sphere(Vector(-2,3,3), 2, msun, "textures/img/sun.bmp");
+    sun->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    scene->Add(sun);
+
+
+    Material mglass = Material{
+        .ambient = Vector(0.0, 0.0, 0.0),
+        .diffuse = Vector(0.3, 0.3, 0.3),
+        .specular = Vector(0,0,0),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = true,
+        .refractionIndex = 1.05,
+        .blurDegree = 0.0
+    };
+    Sphere* glass = new Sphere(Vector(2,1,3), 1, mglass);
+    scene->Add(glass);
+    
+    Material mplane = Material{
+        .ambient = Vector(0.0, 0.45, 0.85),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = true,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.1
+    };
+    scene->Add(new Plane(Vector(2, -1.5, 0), Vector(-4, -1.5, 0), Vector(2, -1.5, 1), mplane));
+
+    scene->Add(Light(
+        Vector(-2,3,3),
+        Vector(1.0, 1.0, 1.0),
+        Vector(1.0, 0.86, 0.0),
+        Vector(1.0, 0.86, 0.0),
+        0.5
+    ));
+    
 }
 
 int main(int argc, char **argv) {

@@ -9,7 +9,7 @@ using namespace algebra;
 
 class Plane : public Shape {
 private:
-    Vector normal, minCoords, maxCoords, point;
+    Vector normal, point;
     float d;
 
 public:

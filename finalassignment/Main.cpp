@@ -28,6 +28,7 @@ void testCase1(Scene* scene);
 void reflectionsCase(Scene* scene);
 void planeCase(Scene* scene);
 void universeCase(Scene* scene);
+void reportCase(Scene* scene);
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -86,11 +87,11 @@ void init(int argc, char **argv) {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     Scene* scene = new Scene;
-    universeCase(scene);
+    reportCase(scene);
 
     Image *image = new Image(640, 480);
 
-    rayTracer = new SimpleRayTracer(scene, image, Camera(Vector(1,0,10)));
+    rayTracer = new SimpleRayTracer(scene, image, Camera(Vector(1.2,0,10)));
 }
 
 void testCase1(Scene* scene) { 
@@ -353,6 +354,74 @@ void universeCase(Scene* scene) {
         0.5
     ));
     
+}
+
+void reportCase(Scene* scene) {
+    Material redspheremat = Material{
+        .ambient = Vector(0.6, 0.0, 0.0),
+        .diffuse = Vector(0.5, 0.0, 0.0),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = true,
+        .refractionIndex = 1.05,
+        .blurDegree = 0.0
+    };
+    Sphere *rsphere = new Sphere(Vector(2,0,0), 1.5, redspheremat);
+    scene->Add(rsphere);
+
+    Material bluespheremat = Material{
+        .ambient = Vector(0.0, 0.0, 0.6),
+        .diffuse = Vector(0.0, 0.0, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 5,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
+    };
+    Sphere *bsphere = new Sphere(Vector(5,0,-4), 1.5, bluespheremat, "textures/img/checkersbig.bmp");
+    bsphere->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    scene->Add(new Sphere(Vector(5,0,-4), 1.5, bluespheremat));
+    
+    Material greenspheremat = Material{
+        .ambient = Vector(0.0, 0.6, 0.0),
+        .diffuse = Vector(0.0, 0.5, 0.0),
+        .specular = Vector(1, 1, 1),
+        .shininess = 20,
+        .reflective = true,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
+    };
+    Sphere *gsphere = new Sphere(Vector(-1,0,-2), 1.5, greenspheremat, "textures/img/checkersbig.bmp");
+    gsphere->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    scene->Add(gsphere);
+    
+    Material planemat = Material{
+        .ambient = Vector(0.72, 0.38, 0.07),
+        .diffuse = Vector(0.5, 0.5, 0.5),
+        .specular = Vector(1, 1, 1),
+        .shininess = 20,
+        .reflective = false,
+        .transparency = false,
+        .refractionIndex = 0.0,
+        .blurDegree = 0.0
+    };
+    Material planematref = planemat;
+    planematref.reflective = true;
+    planematref.blurDegree = 0.3;
+    scene->Add(new Plane(Vector(2, -1.5, 0), Vector(-4, -1.5, 0), Vector(2, -1.5, 1), planematref));
+    scene->Add(new Plane(Vector(0, 0, -6.5), Vector(1, 0, -6.5), Vector(0, 1, -6.5), planemat));
+    scene->Add(new Plane(Vector(-3, 2, 0), Vector(-3, 1, 0), Vector(-3, 1, -1), planemat));
+
+    scene->Add(Light(
+        Vector(9,5,11),
+        Vector(0.7, 0.7, 0.7),
+        Vector(1.0, 1.0, 1.0),
+        Vector(0.8, 0.8, 0.8),
+        2.0
+    ));
 }
 
 int main(int argc, char **argv) {

@@ -10,7 +10,7 @@
 class SimpleRayTracer {
 private:
     Scene* scene;
-    int tests_done;
+    long long int tests_done;
 
 public:
     Image* image;

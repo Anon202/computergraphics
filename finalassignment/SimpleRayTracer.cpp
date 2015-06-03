@@ -58,7 +58,7 @@ Color SimpleRayTracer::Lightning(Vector rayOrigin, const HitRec& hitRec, int dep
                     continue;
                 }
                 this->tests_done++;
-                if (this->scene->shapes[i]->Hit(shadowRay, shadowHitRec)) {
+                if (this->scene->shapes[k]->Hit(shadowRay, shadowHitRec)) {
                     hit = true;
                     break;
                 }
@@ -203,7 +203,7 @@ void SimpleRayTracer::FireRays(void (*glSetPixel)(int, int, const Vector&)) {
     benchmark = true;
     if (benchmark) {
         float ms = (float)(clock() - t)/CLOCKS_PER_SEC;
-        printf("Fire rays time: %.4fs, ray-shape intersection tests: %d\n",
+        printf("Fire rays time: %.4fs, ray-shape intersection tests: %lld\n",
                 ms, this->tests_done);
     }
 }

@@ -323,7 +323,7 @@ void universeCase(Scene* scene) {
     Material mglass = Material{
         .ambient = Vector(0.0, 0.0, 0.0),
         .diffuse = Vector(0.3, 0.3, 0.3),
-        .specular = Vector(0,0,0),
+        .specular = Vector(1.0, 1.0, 1.0),
         .shininess = 5,
         .reflective = false,
         .transparency = true,

@@ -160,8 +160,8 @@ void *run_thread(void *arg) {
                 Color color = Color(0,0,0);
                 for (int yy = 0; yy < NUM_SAMPLES; yy++) {
                     for (int xx = 0; xx < NUM_SAMPLES; xx++) {
-                        float u = (x + (xx + 0.5)/NUM_SAMPLES);
-                        float v = (y + (yy + 0.5)/NUM_SAMPLES);
+                        float u = x + (xx + 0.5)/NUM_SAMPLES;
+                        float v = y + (yy + 0.5)/NUM_SAMPLES;
                         Ray ray;
                         ray.o = tracer->cam.Position();
                         ray.d = tracer->GetEyeRayDirection(u, v);

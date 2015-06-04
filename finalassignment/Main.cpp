@@ -289,7 +289,7 @@ void universeCase(Scene* scene) {
         .blurDegree = 0.5
     };
     Sphere* earth = new Sphere(Vector(1,0,0), 1.5, mearth, "textures/img/world.bmp");
-    earth->colorConf = SphereConf::ONLY_TEXTURE;
+    earth->colorConf = TextureConf::ONLY_TEXTURE;
     scene->Add(earth);
 
     Material mmoon = Material{
@@ -303,7 +303,7 @@ void universeCase(Scene* scene) {
         .blurDegree = 0.0
     };
     Sphere* moon = new Sphere(Vector(3,1.5,2), 0.5, mmoon, "textures/img/moon.bmp");
-    moon->colorConf = SphereConf::ONLY_TEXTURE;
+    moon->colorConf = TextureConf::ONLY_TEXTURE;
     scene->Add(moon);
     
     Material msun = Material{
@@ -317,7 +317,7 @@ void universeCase(Scene* scene) {
         .blurDegree = 0.0
     };
     Sphere* sun = new Sphere(Vector(-2,3,3), 2, msun, "textures/img/sun.bmp");
-    sun->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    sun->colorConf = TextureConf::TEXTURE_AND_COLOR;
     scene->Add(sun);
 
 
@@ -381,7 +381,7 @@ void reportCase(Scene* scene) {
         .blurDegree = 0.0
     };
     Sphere *bsphere = new Sphere(Vector(5,0,-4), 1.5, bluespheremat, "textures/img/checkersbig.bmp");
-    bsphere->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    bsphere->colorConf = TextureConf::TEXTURE_AND_COLOR;
     scene->Add(new Sphere(Vector(5,0,-4), 1.5, bluespheremat));
     
     Material greenspheremat = Material{
@@ -395,7 +395,7 @@ void reportCase(Scene* scene) {
         .blurDegree = 0.0
     };
     Sphere *gsphere = new Sphere(Vector(-1,0,-2), 1.5, greenspheremat, "textures/img/checkersbig.bmp");
-    gsphere->colorConf = SphereConf::TEXTURE_AND_COLOR;
+    gsphere->colorConf = TextureConf::TEXTURE_AND_COLOR;
     scene->Add(gsphere);
     
     Material planemat = Material{

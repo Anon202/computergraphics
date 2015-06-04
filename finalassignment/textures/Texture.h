@@ -10,8 +10,14 @@ typedef struct _MappedCoords {
     float u, v;
 } MappedCoords;
 
+enum class TextureConf {
+    TEXTURE_AND_COLOR,
+    ONLY_COLOR,
+    ONLY_TEXTURE
+};
+
 class Texture {
-private:
+protected:
     BMP bmp;
 public:
     explicit Texture(const char* image_name);

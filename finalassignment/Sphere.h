@@ -7,12 +7,6 @@
 
 using namespace algebra;
 
-enum class SphereConf {
-    TEXTURE_AND_COLOR,
-    ONLY_COLOR,
-    ONLY_TEXTURE
-};
-
 class Sphere : public Shape {
 private:
     Vector c;
@@ -20,12 +14,10 @@ private:
     SphereTexture* texture;
 
 public:
-    SphereConf colorConf = SphereConf::ONLY_COLOR;
+    TextureConf colorConf = TextureConf::ONLY_COLOR;
     Sphere(const Vector & cen, float rad, Material mat);
     Sphere(const Vector & cen, float rad, Material mat, const char* texturefile);
     bool Hit(const Ray & r, HitRec & rec) const;
-    void Texture(SphereTexture* texture);
-    SphereTexture* Texture() const;
     Color GetColor(Vector position) const;
 };
 

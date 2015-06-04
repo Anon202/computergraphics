@@ -42,18 +42,10 @@ bool Sphere::Hit(const Ray &r, HitRec &rec) const {
     return true;
 }
 
-void Sphere::Texture(SphereTexture* texture) {
-    this->texture = texture;
-}
-
-SphereTexture* Sphere::Texture() const {
-    return this->texture;
-}
-
 Color Sphere::GetColor(Vector position) const {
-    if (this->colorConf == SphereConf::ONLY_COLOR || this->texture == NULL) {
+    if (this->colorConf == TextureConf::ONLY_COLOR || this->texture == NULL) {
         return this->material.ambient;
-    } else if (this->colorConf == SphereConf::ONLY_TEXTURE) {
+    } else if (this->colorConf == TextureConf::ONLY_TEXTURE) {
         MappedCoords coords = this->texture->MapObjectCoords(position);
         return this->texture->GetColor(coords.u, coords.v);
     } else {

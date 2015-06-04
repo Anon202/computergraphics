@@ -333,11 +333,11 @@ int BMP::TellBitDepth( void )
 { return BitDepth; }
 
 // int BMP::TellHeight( void ) const
-int BMP::TellHeight( void )
+int BMP::TellHeight( void ) const
 { return Height; }
 
 // int BMP::TellWidth( void ) const
-int BMP::TellWidth( void )
+int BMP::TellWidth( void ) const
 { return Width; }
 
 // int BMP::TellNumberOfColors( void ) const

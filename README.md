@@ -44,20 +44,20 @@ $ optirun ./computergraphics
 
 ### Final assignment
 
-![Sample image 1](https://www.dropbox.com/s/4rahqgp5gaexv7y/image8.png?dl=0)
+![Sample image 1](https://www.dropbox.com/s/4rahqgp5gaexv7y/image8.png?raw=1)
 
-![Sample image 2](https://www.dropbox.com/s/lgyrkb0ym4tlged/image9.png?dl=0)
+![Sample image 2](https://www.dropbox.com/s/lgyrkb0ym4tlged/image9.png?raw=1)
 
 ### Assignments
 
 #### Cartoon shading
 
-![Cartoon shading](https://www.dropbox.com/s/szznz8ps2ajuowo/cartoon.png?dl=0)
+![Cartoon shading](https://www.dropbox.com/s/szznz8ps2ajuowo/cartoon.png?raw=1)
 
 #### Gouraud shading
 
-![Gouraud shading](https://www.dropbox.com/s/y3ktb5tepo90vxm/gouraud.png?dl=0)
+![Gouraud shading](https://www.dropbox.com/s/y3ktb5tepo90vxm/gouraud.png?raw=1)
 
 #### Phong shading
 
-![Phong shading](https://www.dropbox.com/s/vtp3gcbeom5cvf6/phong.png?dl=0)
+![Phong shading](https://www.dropbox.com/s/vtp3gcbeom5cvf6/phong.png?raw=1)
